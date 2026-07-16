@@ -35,17 +35,37 @@ export default function Home() {
       
       <Navbar />
       
-      <main className="pt-32 pb-16 px-6 md:px-12 max-w-7xl mx-auto flex flex-col gap-24">
+      <main className="pt-16 pb-16 px-6 md:px-12 max-w-7xl mx-auto flex flex-col gap-24">
         
         {/* Hero Section */}
-        <section className="relative flex flex-col items-center text-center space-y-8 mt-10 min-h-[50vh] justify-center">
+        <section className="relative flex flex-col items-center text-center space-y-8 mt-32 pt-20 pb-16 min-h-[60vh] justify-center">
           
-          {/* Floating 3D Elements */}
-          <div className="hidden md:block absolute top-10 left-[10%] text-6xl animate-float drop-shadow-[0_15px_15px_rgba(204,255,0,0.4)]">🎮</div>
-          <div className="hidden md:block absolute top-20 right-[15%] text-7xl animate-float-delayed drop-shadow-[0_15px_15px_rgba(255,159,10,0.4)]">🏆</div>
-          <div className="hidden md:block absolute bottom-10 left-[20%] text-5xl animate-float-fast drop-shadow-[0_15px_15px_rgba(0,240,255,0.4)]">💎</div>
-          <div className="hidden md:block absolute bottom-0 right-[25%] text-6xl animate-float drop-shadow-[0_15px_15px_rgba(204,255,0,0.4)]">🎲</div>
+          {/* Floating 3D Elements (CrazyGames Style Depth of Field) */}
           
+          {/* 1. Out-of-focus 3D Plus Sign (Foreground) */}
+          <div className="hidden md:block absolute -top-10 left-[10%] animate-float blur-[4px] opacity-90 scale-125 rotate-12 drop-shadow-[0_20px_30px_rgba(255,159,10,0.5)] z-20">
+            <div className="relative w-24 h-24">
+              <div className="absolute top-8 left-0 w-24 h-8 bg-gradient-to-r from-secondary to-orange-600 rounded-xl shadow-inner" />
+              <div className="absolute top-0 left-8 w-8 h-24 bg-gradient-to-b from-secondary to-orange-600 rounded-xl shadow-inner" />
+            </div>
+          </div>
+
+          {/* 2. Sharp 3D Cube (Midground) */}
+          <div className="hidden md:block absolute top-20 right-[12%] animate-float-delayed blur-[1px] opacity-95 -rotate-12 z-0">
+            <div className="w-24 h-24 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-3xl shadow-[0_15px_35px_rgba(168,85,247,0.5)] border-t border-l border-white/20" />
+          </div>
+
+          {/* 3. Very blurry 3D Pill (Background) */}
+          <div className="hidden md:block absolute bottom-0 left-[15%] animate-float-fast blur-md opacity-70 rotate-45 z-0">
+            <div className="w-16 h-32 bg-gradient-to-br from-tertiary to-blue-600 rounded-full shadow-[0_10px_40px_rgba(0,240,255,0.4)]" />
+          </div>
+
+          {/* 4. Sharp 3D Block (Midground) */}
+          <div className="hidden md:block absolute -bottom-10 right-[20%] animate-float blur-[2px] opacity-90 rotate-[30deg] z-20">
+            <div className="w-28 h-12 bg-gradient-to-r from-primary to-green-500 rounded-xl shadow-[0_20px_30px_rgba(204,255,0,0.4)] border-t border-white/40" />
+          </div>
+          
+          {/* Hero Content */}
           <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.1] relative z-10">
             Level Up Your Game <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">
@@ -53,12 +73,12 @@ export default function Home() {
             </span>
           </h1>
           
-          <p className="max-w-2xl text-lg md:text-xl text-neutral-600 dark:text-neutral-400 font-body relative z-10">
+          <p className="max-w-2xl text-lg md:text-xl text-neutral-600 dark:text-neutral-400 font-body relative z-10 px-4">
             The ultimate gamification platform. Dominate the leaderboards, connect with the community, and turn your killstreaks into real-world prizes.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto relative z-10">
-            <Link href="#games" className="w-full sm:w-auto px-8 py-4 bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-900 dark:text-white font-bold font-mono text-sm uppercase tracking-wider rounded-xl hover:bg-black/5 dark:hover:bg-white/10 hover:-translate-y-1 transition-all backdrop-blur-md text-center">
+          <div className="flex flex-col sm:flex-row items-center gap-4 pt-8 w-full sm:w-auto relative z-10 px-4">
+            <Link href="#games" className="w-full sm:w-auto px-10 py-4 bg-white/70 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-900 dark:text-white font-bold font-mono text-sm uppercase tracking-wider rounded-2xl hover:bg-black/5 dark:hover:bg-white/10 hover:-translate-y-1 transition-all backdrop-blur-md text-center shadow-lg">
               Explore our games
             </Link>
           </div>
