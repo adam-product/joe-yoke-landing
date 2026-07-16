@@ -38,27 +38,26 @@ export default function Home() {
       <main className="pt-32 pb-16 px-6 md:px-12 max-w-7xl mx-auto flex flex-col gap-24">
         
         {/* Hero Section */}
-        <section className="flex flex-col items-center text-center space-y-8 mt-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/10 text-xs font-mono font-bold uppercase tracking-widest backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-            Powered by Joe Yoke AI
-          </div>
+        <section className="relative flex flex-col items-center text-center space-y-8 mt-10 min-h-[50vh] justify-center">
           
-          <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.1]">
-            Play Games. <br />
+          {/* Floating 3D Elements */}
+          <div className="hidden md:block absolute top-10 left-[10%] text-6xl animate-float drop-shadow-[0_15px_15px_rgba(204,255,0,0.4)]">🎮</div>
+          <div className="hidden md:block absolute top-20 right-[15%] text-7xl animate-float-delayed drop-shadow-[0_15px_15px_rgba(255,159,10,0.4)]">🏆</div>
+          <div className="hidden md:block absolute bottom-10 left-[20%] text-5xl animate-float-fast drop-shadow-[0_15px_15px_rgba(0,240,255,0.4)]">💎</div>
+          <div className="hidden md:block absolute bottom-0 right-[25%] text-6xl animate-float drop-shadow-[0_15px_15px_rgba(204,255,0,0.4)]">🎲</div>
+          
+          <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.1] relative z-10">
+            Level Up Your Game <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">
               Earn Rewards.
             </span>
           </h1>
           
-          <p className="max-w-2xl text-lg md:text-xl text-neutral-600 dark:text-neutral-400 font-body">
+          <p className="max-w-2xl text-lg md:text-xl text-neutral-600 dark:text-neutral-400 font-body relative z-10">
             The ultimate gamification platform. Dominate the leaderboards, connect with the community, and turn your killstreaks into real-world prizes.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto">
-            <Link href="#games" className="w-full sm:w-auto px-8 py-4 bg-primary text-[#0B192C] font-bold font-mono text-sm uppercase tracking-wider rounded-xl shadow-[0_0_20px_rgba(204,255,0,0.3)] hover:shadow-[0_0_30px_rgba(204,255,0,0.5)] hover:-translate-y-1 transition-all text-center">
-              Start Playing Free
-            </Link>
+          <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto relative z-10">
             <Link href="#games" className="w-full sm:w-auto px-8 py-4 bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-neutral-900 dark:text-white font-bold font-mono text-sm uppercase tracking-wider rounded-xl hover:bg-black/5 dark:hover:bg-white/10 hover:-translate-y-1 transition-all backdrop-blur-md text-center">
               Explore our games
             </Link>
@@ -66,7 +65,7 @@ export default function Home() {
         </section>
 
         {/* Bento Grid - Trending Games */}
-        <section id="games" className="space-y-8">
+        <section id="games" className="space-y-8 relative z-10">
           <div className="flex items-end justify-between">
             <h2 className="font-heading text-3xl md:text-4xl font-bold tracking-tight">Trending Now</h2>
             <Link href="#" className="font-mono text-sm font-semibold text-neutral-500 hover:text-primary transition-colors hidden sm:block">View All Directory →</Link>
@@ -96,7 +95,7 @@ export default function Home() {
         </section>
 
         {/* Download Section */}
-        <section id="download" className="relative overflow-hidden rounded-[2.5rem] bg-neutral-900 dark:bg-white/5 border border-black/10 dark:border-white/10 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-12 text-white">
+        <section id="download" className="relative overflow-hidden rounded-[2.5rem] bg-neutral-900 dark:bg-white/5 border border-black/10 dark:border-white/10 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-12 text-white relative z-10">
           <div className="absolute right-0 top-0 w-full md:w-1/2 h-full bg-gradient-to-l from-secondary/20 to-transparent pointer-events-none" />
           
           <div className="relative z-10 text-center md:text-left flex-1">
