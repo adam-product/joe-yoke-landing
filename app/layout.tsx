@@ -9,7 +9,7 @@ const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "Joe Yoke | Premium Gamification",
-  description: "Play Games. Earn Rewards.",
+  description: "Level Up Your Game",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
