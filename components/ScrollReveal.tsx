@@ -1,50 +1,38 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 
 export function ScrollReveal({
-  as: Tag = "section",
-  id,
-  className = "",
-  delay = 0,
   children,
+  className = "",
+  id,
 }: {
-  as?: "section" | "div";
-  id?: string;
+  children: React.ReactNode;
   className?: string;
-  delay?: number;
-  children: ReactNode;
+  id?: string;
 }) {
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-inview");
-            observer.unobserve(entry.target);
-          }
-        });
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-revealed");
+          observer.unobserve(el);
+        }
       },
-      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
     );
-
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <Tag
-      ref={ref as never}
-      id={id}
-      className={`scroll-reveal-target ${className}`}
-      style={{ ["--reveal-delay" as string]: `${Math.min(delay * 45, 220)}ms` }}
-    >
+    // The relative block w-full guarantees it respects the layout flow
+    <div id={id} ref={ref} className={`relative block w-full ${className}`}>
       {children}
-    </Tag>
+    </div>
   );
 }
