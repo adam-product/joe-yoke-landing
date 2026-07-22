@@ -21,8 +21,7 @@ export default function Home() {
       <Header onStartProject={() => setModalOpen(true)} />
       <RequestModal open={modalOpen} onClose={() => setModalOpen(false)} />
       
-      {/* Structural Flex Column Container */}
-      <main className="relative flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 pt-32 md:pt-40 gap-20 md:gap-32 pb-16">
+      <main className="relative flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 pt-36 md:pt-44 gap-16 md:gap-28 pb-16">
         <Hero />
         <About />
         <PillBand />

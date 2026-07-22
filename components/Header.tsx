@@ -48,12 +48,10 @@ export function Header({ onStartProject }: { onStartProject?: () => void }) {
           }`}
         >
           <nav className="flex items-center justify-between gap-4">
-            {/* Brand Logo */}
             <a href="#hero" className="font-bold text-sm md:text-base tracking-widest uppercase text-foreground">
               Joe Yoke
             </a>
 
-            {/* Desktop Nav Links */}
             <div className="hidden sm:flex items-center gap-6">
               {NAV_LINKS.map((link) => (
                 <a
@@ -72,7 +70,6 @@ export function Header({ onStartProject }: { onStartProject?: () => void }) {
               </a>
             </div>
 
-            {/* Controls */}
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -97,7 +94,6 @@ export function Header({ onStartProject }: { onStartProject?: () => void }) {
         </div>
       </header>
 
-      {/* Mobile Drawer Menu */}
       <section
         id="menu-overlay"
         className={`fixed inset-0 z-[200] bg-background flex-col ${
@@ -114,9 +110,7 @@ export function Header({ onStartProject }: { onStartProject?: () => void }) {
             className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
             onClick={() => setMenuOpen(false)}
           >
-            <span className="text-sm font-medium uppercase tracking-widest">
-              Close
-            </span>
+            <span className="text-sm font-medium uppercase tracking-widest">Close</span>
             <X size={22} />
           </button>
         </div>
@@ -129,9 +123,7 @@ export function Header({ onStartProject }: { onStartProject?: () => void }) {
               onClick={() => setMenuOpen(false)}
               className="group flex items-center justify-between border-b border-foreground/10 py-5 text-foreground hover:text-primary transition-colors"
             >
-              <span className="text-2xl font-bold tracking-tight">
-                {link.label}
-              </span>
+              <span className="text-2xl font-bold tracking-tight">{link.label}</span>
               <ArrowRight size={22} className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
           ))}
