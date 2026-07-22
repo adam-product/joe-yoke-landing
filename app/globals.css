@@ -59,7 +59,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-onest), sans-serif;
-  overflow-x: clip; /* Changed from hidden to clip to prevent flexbox layout breaks */
+  overflow-x: hidden;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -211,7 +211,8 @@ body {
   pointer-events: none;
   z-index: 0;
   transform: translate3d(0, -50%, 0);
-  transition: background-color 0.3s ease;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease;
   filter: url(#nav-gooey);
 }
 
@@ -352,9 +353,7 @@ body {
   will-change: transform, opacity, filter;
 }
 
-/* Supports both .is-inview and .is-revealed classes interchangeably to fix intersection observer mismatches */
-.scroll-reveal-target.is-inview,
-.scroll-reveal-target.is-revealed {
+.scroll-reveal-target.is-inview {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
   filter: blur(0);
