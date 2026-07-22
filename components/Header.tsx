@@ -18,6 +18,7 @@ const MENU_LINKS = [
   { href: "#footer", label: "Contact" },
 ];
 
+
 export function Header({ onStartProject }: { onStartProject: () => void }) {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
