@@ -9,10 +9,12 @@ const HEADLINE = [
 ];
 
 export function Hero() {
+  // UPDATED: Removed 'min-h-screen' and 'justify-end'. 
+  // Added 'min-h-[70vh]' and 'justify-center' to let it size naturally and prevent overlap.
   return (
     <section
       id="hero"
-      className="relative w-full min-h-screen bg-background overflow-hidden flex flex-col justify-end"
+      className="relative w-full min-h-[70vh] flex flex-col justify-center overflow-hidden"
     >
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
         <span
@@ -41,7 +43,7 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-10 w-full px-6 pb-16 pt-40 flex flex-col gap-8">
+      <div className="relative z-10 w-full px-6 py-12 flex flex-col gap-8">
         <div className="hero-headline flex flex-col gap-0">
           {HEADLINE.map((line) => (
             <div className="hero-headline-line" key={line.text}>

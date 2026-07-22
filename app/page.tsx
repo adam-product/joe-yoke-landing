@@ -22,7 +22,13 @@ export default function Home() {
       <Loader />
       <Header onStartProject={() => setModalOpen(true)} />
       <RequestModal open={modalOpen} onClose={() => setModalOpen(false)} />
-      <main>
+      
+      {/* 
+        UPDATED: Added flex column layout with strict gaps and padding.
+        - 'pt-32' ensures the Hero isn't hidden behind your fixed Header.
+        - 'flex flex-col gap-24' forces every section to stack properly with breathing room.
+      */}
+      <main className="relative flex flex-col gap-24 md:gap-32 pt-32 pb-16 px-6 md:px-12 max-w-7xl mx-auto overflow-hidden">
         <Hero />
         <About />
         <PillBand />
@@ -30,6 +36,7 @@ export default function Home() {
         <CategoryList />
         <StatsSection />
       </main>
+      
       <Footer onDownloadClick={() => setModalOpen(true)} />
     </div>
   );

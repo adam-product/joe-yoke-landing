@@ -97,7 +97,14 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
 
   return (
     <>
-      <section id="header" className="w-full">
+      {/* 
+        UPDATED: Swapped `<section>` for `<header>` and added z-[100], fixed positioning, 
+        and strict backdrop blurs so content doesn't bleed through on scroll. 
+      */}
+      <header 
+        id="header" 
+        className="fixed top-0 left-0 right-0 z-[100] w-full bg-white/80 dark:bg-[#0B192C]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/10 transition-all duration-300"
+      >
         <svg width="0" height="0" aria-hidden="true" focusable="false">
           <defs>
             <filter id="nav-gooey">
@@ -112,7 +119,7 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
             </filter>
           </defs>
         </svg>
-        <div className={`top-nav-wrap ${isVisible ? "is-visible" : ""}`}>
+        <div className={`top-nav-wrap py-4 ${isVisible ? "is-visible" : ""}`}>
           <nav id="top-nav" className="top-nav">
             <a className="top-brand" href="#hero">
               Joe Yoke
@@ -177,12 +184,12 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
             </button>
           </nav>
         </div>
-      </section>
+      </header>
 
       {/* Mobile / full menu overlay */}
       <section
         id="menu-overlay"
-        className={`fixed inset-0 z-50 bg-background flex-col ${
+        className={`fixed inset-0 z-[200] bg-background flex-col ${
           menuOpen ? "flex" : "hidden"
         }`}
       >
