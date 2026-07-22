@@ -28,6 +28,7 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
   const navCenterRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [gooStyle, setGooStyle] = useState({ x: 0, w: 82 });
+  const hoveringRef = useRef(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -55,6 +56,33 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const sectionIds = ["#portfolio", "#services", "#footer"];
+
+    function syncActiveFromScroll() {
+      if (hoveringRef.current) return;
+      const navHeight = 140;
+      let idx = 0;
+      for (let i = 0; i < sectionIds.length; i++) {
+        const el = document.querySelector(sectionIds[i]);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= navHeight) {
+          idx = i;
+        }
+      }
+      moveTo(idx);
+    }
+
+    syncActiveFromScroll();
+    window.addEventListener("scroll", syncActiveFromScroll, { passive: true });
+    window.addEventListener("resize", syncActiveFromScroll);
+    return () => {
+      window.removeEventListener("scroll", syncActiveFromScroll);
+      window.removeEventListener("resize", syncActiveFromScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
@@ -79,7 +107,13 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
             <a className="top-brand" href="#hero">
               Joe Yoke
             </a>
-            <div ref={navCenterRef} className="top-nav-center">
+            <div
+              ref={navCenterRef}
+              className="top-nav-center"
+              onMouseLeave={() => {
+                hoveringRef.current = false;
+              }}
+            >
               <span
                 className="nav-goo"
                 style={{
@@ -95,8 +129,14 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
                   }}
                   href={link.href}
                   className={`nav-link ${activeIndex === i ? "is-active" : ""}`}
-                  onMouseEnter={() => moveTo(i)}
-                  onFocus={() => moveTo(i)}
+                  onMouseEnter={() => {
+                    hoveringRef.current = true;
+                    moveTo(i);
+                  }}
+                  onFocus={() => {
+                    hoveringRef.current = true;
+                    moveTo(i);
+                  }}
                 >
                   {link.label}
                 </a>
@@ -109,8 +149,14 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
                 className={`nav-cta ${
                   activeIndex === NAV_LINKS.length ? "is-active" : ""
                 }`}
-                onMouseEnter={() => moveTo(NAV_LINKS.length)}
-                onFocus={() => moveTo(NAV_LINKS.length)}
+                onMouseEnter={() => {
+                  hoveringRef.current = true;
+                  moveTo(NAV_LINKS.length);
+                }}
+                onFocus={() => {
+                  hoveringRef.current = true;
+                  moveTo(NAV_LINKS.length);
+                }}
               >
                 Download App
               </a>

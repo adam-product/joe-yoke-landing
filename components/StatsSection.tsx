@@ -68,11 +68,12 @@ export function StatsSection() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setActive(true);
+            entry.target.classList.add("is-inview");
             observer.disconnect();
           }
         });
       },
-      { threshold: 0.35 }
+      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
