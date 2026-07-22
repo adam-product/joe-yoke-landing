@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { Sun, MoonStar, X, Menu, ArrowRight } from "./icons";
 
@@ -21,79 +21,139 @@ const MENU_LINKS = [
 export function Header({ onStartProject }: { onStartProject?: () => void }) {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const navCenterRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [gooStyle, setGooStyle] = useState({ x: 0, w: 82 });
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    function handleScroll() {
-      setIsScrolled(window.scrollY > 20);
+    function syncNavVisibility() {
+      setIsVisible(window.scrollY > 36);
     }
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    syncNavVisibility();
+    window.addEventListener("scroll", syncNavVisibility, { passive: true });
+    return () => window.removeEventListener("scroll", syncNavVisibility);
+  }, []);
+
+  const moveTo = (index: number) => {
+    const el = linkRefs.current[index];
+    const center = navCenterRef.current;
+    if (!el || !center) return;
+    const centerRect = center.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    setGooStyle({ x: rect.left - centerRect.left, w: rect.width });
+    setActiveIndex(index);
+  };
+
+  const moveGooOnly = (index: number) => {
+    const el = linkRefs.current[index];
+    const center = navCenterRef.current;
+    if (!el || !center) return;
+    const centerRect = center.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    setGooStyle({ x: rect.left - centerRect.left, w: rect.width });
+  };
+
+  useEffect(() => {
+    moveTo(0);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
     <>
-      <header className="fixed top-4 inset-x-0 z-[100] flex justify-center px-4 pointer-events-none">
-        <div
-          className={`w-full max-w-5xl transition-all duration-500 ease-out pointer-events-auto rounded-full ${
-            isScrolled
-              ? "bg-background/40 dark:bg-background/60 backdrop-blur-2xl saturate-150 border border-foreground/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] py-2.5 px-6"
-              : "bg-background/20 backdrop-blur-md border border-foreground/5 py-3.5 px-6"
-          }`}
-        >
-          <nav className="flex items-center justify-between gap-4">
-            <a href="#hero" className="font-bold text-sm md:text-base tracking-widest uppercase text-foreground">
+      <header id="header" className="fixed top-0 left-0 right-0 z-[100] w-full pointer-events-none">
+        <svg width="0" height="0" aria-hidden="true" focusable="false">
+          <defs>
+            <filter id="nav-gooey">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+              <feColorMatrix
+                in="blur"
+                mode="matrix"
+                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -12"
+                result="goo"
+              />
+              <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+            </filter>
+          </defs>
+        </svg>
+
+        <div className={`top-nav-wrap pointer-events-auto ${isVisible ? "is-visible" : ""}`}>
+          <nav id="top-nav" className="top-nav">
+            <a className="top-brand font-bold uppercase tracking-widest" href="#hero">
               Joe Yoke
             </a>
 
-            <div className="hidden sm:flex items-center gap-6">
-              {NAV_LINKS.map((link) => (
+            <div
+              ref={navCenterRef}
+              className="top-nav-center"
+              onMouseLeave={() => moveTo(activeIndex)}
+            >
+              <span
+                className="nav-goo"
+                style={{
+                  transform: `translate3d(${gooStyle.x}px, -50%, 0)`,
+                  width: `${Math.max(62, gooStyle.w)}px`,
+                }}
+              />
+              {NAV_LINKS.map((link, i) => (
                 <a
                   key={link.href}
+                  ref={(el) => {
+                    linkRefs.current[i] = el;
+                  }}
                   href={link.href}
-                  className="text-xs font-semibold uppercase tracking-widest text-foreground/80 hover:text-primary transition-colors"
+                  className={`nav-link ${activeIndex === i ? "is-active" : ""}`}
+                  onMouseEnter={() => moveGooOnly(i)}
+                  onFocus={() => moveGooOnly(i)}
                 >
                   {link.label}
                 </a>
               ))}
               <a
+                ref={(el) => {
+                  linkRefs.current[NAV_LINKS.length] = el;
+                }}
                 href="#footer"
-                className="text-xs font-semibold uppercase tracking-widest text-foreground/80 hover:text-primary transition-colors"
+                className={`nav-cta ${
+                  activeIndex === NAV_LINKS.length ? "is-active" : ""
+                }`}
+                onMouseEnter={() => moveGooOnly(NAV_LINKS.length)}
+                onFocus={() => moveGooOnly(NAV_LINKS.length)}
               >
                 Download App
               </a>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                aria-label="Toggle dark mode"
-                onClick={() => setTheme(isDark ? "light" : "dark")}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-foreground/15 bg-background/50 text-xs font-bold uppercase tracking-widest hover:bg-foreground/5 transition-all"
-              >
-                {isDark ? <MoonStar /> : <Sun />}
-                <span className="hidden xs:inline">{isDark ? "Dark" : "Light"}</span>
-              </button>
+            <button
+              id="theme-toggle"
+              className="theme-toggle rounded-theme-btn cursor-pointer"
+              type="button"
+              aria-label="Toggle dark mode"
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+            >
+              {isDark ? <MoonStar size={16} /> : <Sun size={16} />}
+              <span>{isDark ? "Dark" : "Light"}</span>
+            </button>
 
-              <button
-                type="button"
-                aria-label="Open menu"
-                onClick={() => setMenuOpen(true)}
-                className="sm:hidden inline-flex items-center justify-center h-8 w-8 rounded-full border border-foreground/15 text-foreground"
-              >
-                <Menu size={16} />
-              </button>
-            </div>
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={() => setMenuOpen(true)}
+              className="sm:hidden inline-flex items-center justify-center h-9 w-9 rounded-full border border-foreground/14 text-foreground"
+            >
+              <Menu size={18} />
+            </button>
           </nav>
         </div>
       </header>
 
+      {/* Mobile Drawer */}
       <section
         id="menu-overlay"
         className={`fixed inset-0 z-[200] bg-background flex-col ${
@@ -107,7 +167,7 @@ export function Header({ onStartProject }: { onStartProject?: () => void }) {
           <button
             type="button"
             aria-label="Close menu"
-            className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-2 text-foreground hover:text-primary transition-colors cursor-pointer"
             onClick={() => setMenuOpen(false)}
           >
             <span className="text-sm font-medium uppercase tracking-widest">Close</span>
@@ -123,8 +183,8 @@ export function Header({ onStartProject }: { onStartProject?: () => void }) {
               onClick={() => setMenuOpen(false)}
               className="group flex items-center justify-between border-b border-foreground/10 py-5 text-foreground hover:text-primary transition-colors"
             >
-              <span className="text-2xl font-bold tracking-tight">{link.label}</span>
-              <ArrowRight size={22} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="text-3xl font-bold tracking-tight">{link.label}</span>
+              <ArrowRight size={24} className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
           ))}
         </nav>
