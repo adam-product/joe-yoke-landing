@@ -28,7 +28,6 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
   const navCenterRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const [gooStyle, setGooStyle] = useState({ x: 0, w: 82 });
-  const hoveringRef = useRef(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -51,6 +50,18 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
     setActiveIndex(index);
   };
 
+  // Hover preview: slides the goo pill to the hovered link without changing
+  // which link is "active" — the active section is decided by scroll position
+  // only, so the highlight always matches what's actually on screen.
+  const moveGooOnly = (index: number) => {
+    const el = linkRefs.current[index];
+    const center = navCenterRef.current;
+    if (!el || !center) return;
+    const centerRect = center.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    setGooStyle({ x: rect.left - centerRect.left, w: rect.width });
+  };
+
   useEffect(() => {
     moveTo(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,7 +71,6 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
     const sectionIds = ["#portfolio", "#services", "#footer"];
 
     function syncActiveFromScroll() {
-      if (hoveringRef.current) return;
       const navHeight = 140;
       let idx = 0;
       for (let i = 0; i < sectionIds.length; i++) {
@@ -110,9 +120,7 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
             <div
               ref={navCenterRef}
               className="top-nav-center"
-              onMouseLeave={() => {
-                hoveringRef.current = false;
-              }}
+              onMouseLeave={() => moveTo(activeIndex)}
             >
               <span
                 className="nav-goo"
@@ -129,14 +137,8 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
                   }}
                   href={link.href}
                   className={`nav-link ${activeIndex === i ? "is-active" : ""}`}
-                  onMouseEnter={() => {
-                    hoveringRef.current = true;
-                    moveTo(i);
-                  }}
-                  onFocus={() => {
-                    hoveringRef.current = true;
-                    moveTo(i);
-                  }}
+                  onMouseEnter={() => moveGooOnly(i)}
+                  onFocus={() => moveGooOnly(i)}
                 >
                   {link.label}
                 </a>
@@ -149,14 +151,8 @@ export function Header({ onStartProject }: { onStartProject: () => void }) {
                 className={`nav-cta ${
                   activeIndex === NAV_LINKS.length ? "is-active" : ""
                 }`}
-                onMouseEnter={() => {
-                  hoveringRef.current = true;
-                  moveTo(NAV_LINKS.length);
-                }}
-                onFocus={() => {
-                  hoveringRef.current = true;
-                  moveTo(NAV_LINKS.length);
-                }}
+                onMouseEnter={() => moveGooOnly(NAV_LINKS.length)}
+                onFocus={() => moveGooOnly(NAV_LINKS.length)}
               >
                 Download App
               </a>
