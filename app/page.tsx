@@ -25,7 +25,7 @@ export default function Home() {
         Increased padding-top (pt-48 lg:pt-56) to ensure the fixed Header 
         never overlaps the Hero text.
       */}
-      <main className="relative flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 pt-48 lg:pt-56 overflow-hidden">
+      <main className="relative flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-12 pt-36 sm:pt-48 lg:pt-56 overflow-hidden">
         <div className="relative block w-full mb-16 md:mb-24"><Hero /></div>
         <div className="relative block w-full mb-16 md:mb-24"><About /></div>
         <div className="relative block w-full mb-16 md:mb-24"><PillBand /></div>
