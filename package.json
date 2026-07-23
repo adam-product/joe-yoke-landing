@@ -1,0 +1,27 @@
+{
+    "name": "joe-yoke-v2",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "next lint"
+    },
+    "dependencies": {
+      "framer-motion": "^11.18.2",
+      "lucide-react": "^0.475.0",
+      "next": "14.2.23",
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+      "@tailwindcss/postcss": "^4.0.0",
+      "@types/node": "^20.17.0",
+      "@types/react": "^18.3.0",
+      "@types/react-dom": "^18.3.0",
+      "postcss": "^8.5.1",
+      "tailwindcss": "^4.0.0",
+      "typescript": "^5.7.3"
+    }
+  }
