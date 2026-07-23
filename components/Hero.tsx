@@ -41,7 +41,7 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-10 w-full px-6 pb-16 pt-40 flex flex-col gap-8">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-40 flex flex-col gap-8">
         <div className="hero-headline flex flex-col gap-0">
           {HEADLINE.map((line) => (
             <div className="hero-headline-line" key={line.text}>
@@ -68,8 +68,6 @@ export function Hero() {
           </a>
         </div>
       </div>
-
-      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary/20 z-10" />
     </section>
   );
 }
