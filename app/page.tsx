@@ -11,17 +11,18 @@ import { GamesGrid } from "@/components/GamesGrid";
 import { CategoryList } from "@/components/CategoryList";
 import { StatsSection } from "@/components/StatsSection";
 import { Footer } from "@/components/Footer";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
+      <SmoothScroll />
       <Loader />
       <Header onStartProject={() => setModalOpen(true)} />
       <RequestModal open={modalOpen} onClose={() => setModalOpen(false)} />
-      
-      <main className="relative flex flex-col w-full max-w-[1400px] mx-auto px-6 md:px-12 gap-20 md:gap-32 pb-24">
+      <main>
         <Hero />
         <About />
         <PillBand />
@@ -29,7 +30,6 @@ export default function Home() {
         <CategoryList />
         <StatsSection />
       </main>
-      
       <Footer onDownloadClick={() => setModalOpen(true)} />
     </div>
   );

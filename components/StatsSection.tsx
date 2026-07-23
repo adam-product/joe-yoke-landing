@@ -58,7 +58,7 @@ function StatValue({
 
 export function StatsSection() {
   const [active, setActive] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -69,11 +69,11 @@ export function StatsSection() {
           if (entry.isIntersecting) {
             setActive(true);
             entry.target.classList.add("is-inview");
-            observer.disconnect();
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0.35, rootMargin: "0px 0px -8% 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -83,18 +83,17 @@ export function StatsSection() {
     <section
       id="stats"
       ref={ref}
-      // Added relative, block, w-full, and z-10 to separate it from the footer
-      className="relative block w-full bg-background py-10 z-10 scroll-reveal-target"
+      className="bg-background w-full py-10 px-4 scroll-reveal-target"
     >
-      <div className="w-full">
-        <div className="bg-[#0a0a0a] text-white rounded-[28px] border border-white/10 px-7 sm:px-12 py-12 sm:py-16 w-full relative overflow-hidden shadow-2xl">
-          <p className="text-white/65 text-xs sm:text-sm font-semibold tracking-widest uppercase mb-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-[#0a0a0a] text-white rounded-[28px] border border-white/10 px-7 sm:px-10 py-10 sm:py-12">
+          <p className="text-white/65 text-xs sm:text-sm font-medium tracking-widest uppercase mb-3">
             Our Community
           </p>
-          <h2 className="font-bold text-white leading-[1.05] text-[clamp(32px,5vw,64px)] max-w-4xl mb-12">
+          <h2 className="font-bold text-white leading-[1.05] text-[clamp(30px,5vw,56px)] max-w-3xl mb-10">
             Millions of players. Endless ways to connect.
           </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-8 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-6">
             {STATS.map((stat) => (
               <div className="flex flex-col gap-2" key={stat.label}>
                 <StatValue
@@ -103,7 +102,7 @@ export function StatsSection() {
                   active={active}
                   isRating={stat.isRating}
                 />
-                <span className="text-white/65 text-sm md:text-base font-medium">{stat.label}</span>
+                <span className="text-white/65 text-sm">{stat.label}</span>
               </div>
             ))}
           </div>
