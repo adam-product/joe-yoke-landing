@@ -41,31 +41,33 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-40 flex flex-col gap-8">
-        <div className="hero-headline flex flex-col gap-0">
-          {HEADLINE.map((line) => (
-            <div className="hero-headline-line" key={line.text}>
-              <h1
-                className={`hero-headline-text font-bold ${
-                  line.accent ? "text-primary" : "text-foreground"
-                }`}
-                style={{ fontSize: "clamp(36px, 8vw, 96px)" }}
-              >
-                {line.text}
-              </h1>
-            </div>
-          ))}
-        </div>
+      <div className="relative z-10 w-full pb-16 pt-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-8">
+          <div className="hero-headline flex flex-col gap-0">
+            {HEADLINE.map((line) => (
+              <div className="hero-headline-line" key={line.text}>
+                <h1
+                  className={`hero-headline-text font-bold ${
+                    line.accent ? "text-primary" : "text-foreground"
+                  }`}
+                  style={{ fontSize: "clamp(36px, 8vw, 96px)" }}
+                >
+                  {line.text}
+                </h1>
+              </div>
+            ))}
+          </div>
 
-        <div className="flex flex-col gap-4 mt-4">
-          <a href="#portfolio" className="engage-card">
-            <div className="engage-card-copy">
-              <span className="engage-card-title">Play Games</span>
-            </div>
-            <span className="engage-card-arrow" aria-hidden="true">
-              <ArrowRight size={16} />
-            </span>
-          </a>
+          <div className="flex flex-col gap-4 mt-4">
+            <a href="#portfolio" className="engage-card">
+              <div className="engage-card-copy">
+                <span className="engage-card-title">Play Games</span>
+              </div>
+              <span className="engage-card-arrow" aria-hidden="true">
+                <ArrowRight size={16} />
+              </span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
