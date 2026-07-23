@@ -21,7 +21,7 @@ export default function Home() {
       <Header onStartProject={() => setModalOpen(true)} />
       <RequestModal open={modalOpen} onClose={() => setModalOpen(false)} />
       
-      <main className="relative flex flex-col w-full max-w-7xl mx-auto px-6 md:px-12 pt-32 lg:pt-40 gap-20 md:gap-28 pb-16">
+      <main className="relative flex flex-col w-full max-w-[1400px] mx-auto px-6 md:px-12 gap-20 md:gap-32 pb-24">
         <Hero />
         <About />
         <PillBand />
