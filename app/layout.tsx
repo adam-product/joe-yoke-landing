@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Onest } from "next/font/google";
+
+// THIS IS THE CRITICAL LINE THAT WAS LIKELY MISSING
 import "./globals.css";
 
 const onest = Onest({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Joe Yoke — Social Gaming App",
-  description: "The ultimate place to play multiplayer games, chat, and hang out with friends.",
+  description: "The games bring you in, but the friendships keep you here.",
 };
 
 export default function RootLayout({
