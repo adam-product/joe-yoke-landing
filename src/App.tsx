@@ -11,15 +11,9 @@ import gameImg4 from '@/imports/photo_2026-07-23_20-54-19.jpg'
 import { useGames } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-interface Game {
-  badge: string; title: string; description: string; id: number; image: string;
-}
-interface Category {
-  index: string; title: string; tags: string;
-}
+interface Game { badge: string; title: string; description: string; id: number; image: string; }
+interface Category { index: string; title: string; tags: string; }
 
-// ─── Data ────────────────────────────────────────────────────────────────────
 const NAV_LINKS = ['GAMES', 'COMMUNITY', 'DOWNLOAD APP']
 const NAV_TARGETS = ['games', 'community', 'download']
 
@@ -43,7 +37,6 @@ const FOOTER_LINKS = [
   { heading: 'Social', links: ['Twitter/X', 'Discord', 'Instagram', 'TikTok'] },
 ]
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 const ease = [0.16, 1, 0.3, 1] as const
 
 function FadeUp({ children, delay = 0, className, dark }: { children: ReactNode; delay?: number; className?: string; dark?: boolean }) {
@@ -57,13 +50,16 @@ function FadeUp({ children, delay = 0, className, dark }: { children: ReactNode;
   )
 }
 
-// Safely render HTML from ReactQuill and strip paragraph tags for inline elements
+// Fixed HTML Parser: Allows formatting and paragraph tags to preserve line breaks
 const renderHTML = (html: string) => {
   if (!html) return { __html: '' };
-  return { __html: html.replace(/<\/?p>/g, ' ').trim() };
+  // Convert standard \n to <br> if it hasn't been formatted by Quill yet
+  if (!html.includes('<p>') && html.includes('\n')) {
+    return { __html: html.replace(/\n/g, '<br/>') };
+  }
+  return { __html: html };
 };
 
-// ─── Header ──────────────────────────────────────────────────────────────────
 function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v: boolean) => void }) {
   const [activeNav, setActiveNav] = useState(0)
   const [scrolled, setScrolled] = useState(false)
@@ -150,20 +146,21 @@ function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v:
   )
 }
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
 function Hero({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const heroSrc = get('hero', 'heroImage') || pyramidImg
 
   return (
     <section className={`min-h-screen flex items-center px-6 md:px-12 pt-20 pb-16 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
-      <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8">
-        <div className="flex-1 flex flex-col gap-8">
+      <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8 overflow-hidden">
+        {/* Left Side: min-w-0 prevents text from pushing the image out of the container */}
+        <div className="flex-1 flex flex-col gap-8 min-w-0 w-full z-10">
           <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.9, ease, delay: 0.1 }}>
-            <h1 className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-none tracking-tighter transition-colors duration-500 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('hero', 'headline'))} />
+            {/* Added break-words and leading-[1.1] to prevent giant lines */}
+            <div className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tighter transition-colors duration-500 break-words [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('hero', 'headline'))} />
           </motion.div>
 
-          <motion.p className={`text-lg max-w-md leading-relaxed transition-colors duration-500 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }} dangerouslySetInnerHTML={renderHTML(get('hero', 'subtext'))} />
+          <motion.div className={`text-lg max-w-md leading-relaxed transition-colors duration-500 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }} dangerouslySetInnerHTML={renderHTML(get('hero', 'subtext'))} />
 
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.45 }}>
             <button className={`group flex items-center gap-3 rounded-full pl-6 pr-2 py-2 font-semibold text-sm transition-colors w-fit ${dark ? 'bg-white text-[#0A0A0A] hover:bg-white/90' : 'bg-[#1A1A1A] text-white hover:bg-[#0A0A0A]'}`}>
@@ -174,7 +171,9 @@ function Hero({ dark }: { dark: boolean }) {
             </button>
           </motion.div>
         </div>
-        <div className="flex-1 flex items-center justify-center">
+
+        {/* Right Side: Mockup Image */}
+        <div className="flex-1 flex items-center justify-center min-w-0 w-full">
           <motion.div animate={{ y: [0, -22, 0] }} transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}>
             <motion.div initial={{ opacity: 0, scale: 0.85, rotate: -8 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>
               <img src={heroSrc} alt="Hero mockup" className="w-72 h-72 sm:w-96 sm:h-96 lg:w-[480px] lg:h-[480px] object-contain drop-shadow-2xl select-none" draggable={false} />
@@ -186,7 +185,6 @@ function Hero({ dark }: { dark: boolean }) {
   )
 }
 
-// ─── About & Pill Band ────────────────────────────────────────────────────────
 function About({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const pills = [get('about', 'pill1'), get('about', 'pill2'), get('about', 'pill3')].filter(Boolean)
@@ -195,18 +193,18 @@ function About({ dark }: { dark: boolean }) {
     <section className={`py-20 px-6 md:px-12 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <div className="max-w-4xl mx-auto flex flex-col items-center gap-12">
         <FadeUp>
-          <p className={`text-2xl md:text-3xl text-center leading-snug font-medium transition-colors duration-500 ${dark ? 'text-white/60' : 'text-[#1A1A1A]/70'}`} dangerouslySetInnerHTML={renderHTML(get('about', 'quote'))} />
+          <div className={`text-2xl md:text-3xl text-center leading-snug font-medium transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/60' : 'text-[#1A1A1A]/70'}`} dangerouslySetInnerHTML={renderHTML(get('about', 'quote'))} />
         </FadeUp>
         <FadeUp delay={0.1}>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {pills.slice(0, -1).map((word, i) => (
-              <span key={i} className={`px-6 py-2.5 rounded-full border font-semibold text-sm tracking-wide transition-colors duration-500 ${dark ? 'border-white/15 text-white' : 'border-[#1A1A1A]/20 text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(word)} />
+              <span key={i} className={`px-6 py-2.5 rounded-full border font-semibold text-sm tracking-wide transition-colors duration-500 [&_p]:m-0 ${dark ? 'border-white/15 text-white' : 'border-[#1A1A1A]/20 text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(word)} />
             ))}
             <span className="w-10 h-10 rounded-full bg-[#C5FF00] flex items-center justify-center">
               <ArrowRight className="w-5 h-5 text-[#1A1A1A]" />
             </span>
             {pills[pills.length - 1] && (
-              <span className={`px-6 py-2.5 rounded-full border font-semibold text-sm tracking-wide transition-colors duration-500 ${dark ? 'border-white/15 text-white' : 'border-[#1A1A1A]/20 text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(pills[pills.length - 1])} />
+              <span className={`px-6 py-2.5 rounded-full border font-semibold text-sm tracking-wide transition-colors duration-500 [&_p]:m-0 ${dark ? 'border-white/15 text-white' : 'border-[#1A1A1A]/20 text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(pills[pills.length - 1])} />
             )}
           </div>
         </FadeUp>
@@ -215,7 +213,6 @@ function About({ dark }: { dark: boolean }) {
   )
 }
 
-// ─── Trending Games Grid ──────────────────────────────────────────────────────
 const CARD_ACCENTS = ['#60a5fa', '#34d399', '#fb923c', '#f87171', '#a78bfa', '#fbbf24']
 
 function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boolean; index: number }) {
@@ -259,7 +256,7 @@ function TrendingGames({ dark }: { dark: boolean }) {
       <div className="max-w-7xl mx-auto">
         <FadeUp>
           <div className="flex items-end justify-between mb-12 flex-wrap gap-4">
-            <h2 className={`text-4xl md:text-5xl font-black tracking-tighter leading-none transition-colors duration-500 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('games', 'sectionTitle'))} />
+            <div className={`text-4xl md:text-5xl font-black tracking-tighter leading-none transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('games', 'sectionTitle'))} />
             <button onClick={() => navigate('/games')} className={`group flex items-center gap-2 text-sm font-semibold transition-colors ${dark ? 'text-white/40 hover:text-white' : 'text-[#1A1A1A]/50 hover:text-[#1A1A1A]'}`}>
               View all <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
@@ -273,7 +270,6 @@ function TrendingGames({ dark }: { dark: boolean }) {
   )
 }
 
-// ─── Interactive Categories ───────────────────────────────────────────────────
 function CategoryRow({ cat, delay, dark }: { cat: Category; delay: number; dark: boolean }) {
   const [hovered, setHovered] = useState(false)
   return (
@@ -310,7 +306,6 @@ function Categories({ dark }: { dark: boolean }) {
   )
 }
 
-// ─── Community Stats ──────────────────────────────────────────────────────────
 function CommunityStats({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const stats = [1, 2, 3, 4].map(n => ({ value: get('stats', `stat${n}_value`), label: get('stats', `stat${n}_label`) }))
@@ -323,10 +318,10 @@ function CommunityStats({ dark }: { dark: boolean }) {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-14">
               <div>
                 <p className="text-xs font-bold text-white/30 tracking-widest uppercase mb-4">Our Community</p>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter leading-none" dangerouslySetInnerHTML={renderHTML(get('stats', 'headline'))} />
+                <div className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter leading-[1.1] [&_p]:m-0" dangerouslySetInnerHTML={renderHTML(get('stats', 'headline'))} />
               </div>
               <button className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 font-bold text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0">
-                <span dangerouslySetInnerHTML={renderHTML(get('stats', 'ctaLabel'))} />
+                <span dangerouslySetInnerHTML={renderHTML(get('stats', 'ctaLabel'))} className="[&_p]:m-0" />
                 <span className="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300">
                   <ArrowRight className="w-4 h-4 text-[#C5FF00]" />
                 </span>
@@ -336,8 +331,8 @@ function CommunityStats({ dark }: { dark: boolean }) {
               {stats.map((stat, i) => (
                 <FadeUp key={i} delay={i * 0.1}>
                   <div className="flex flex-col gap-2">
-                    <span className="text-4xl md:text-5xl font-black text-[#C5FF00] tracking-tighter leading-none" dangerouslySetInnerHTML={renderHTML(stat.value)} />
-                    <span className="text-sm text-white/40 font-medium" dangerouslySetInnerHTML={renderHTML(stat.label)} />
+                    <div className="text-4xl md:text-5xl font-black text-[#C5FF00] tracking-tighter leading-none [&_p]:m-0" dangerouslySetInnerHTML={renderHTML(stat.value)} />
+                    <div className="text-sm text-white/40 font-medium [&_p]:m-0" dangerouslySetInnerHTML={renderHTML(stat.label)} />
                   </div>
                 </FadeUp>
               ))}
@@ -349,7 +344,6 @@ function CommunityStats({ dark }: { dark: boolean }) {
   )
 }
 
-// ─── Footer ───────────────────────────────────────────────────────────────────
 function Footer({ dark }: { dark: boolean }) {
   const { get } = useContent()
 
@@ -358,12 +352,12 @@ function Footer({ dark }: { dark: boolean }) {
       <div className="max-w-7xl mx-auto">
         <FadeUp>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-16 border-b border-white/10">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-none max-w-2xl">
-              <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaHeadline'))} />{' '}
+            <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-none max-w-2xl flex flex-wrap gap-2 [&_p]:m-0">
+              <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaHeadline'))} />
               <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaTagline'))} />
-            </h2>
+            </div>
             <button className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2.5 font-bold text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0">
-              <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaBtn'))} />
+              <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaBtn'))} className="[&_p]:m-0" />
               <span className="w-9 h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300">
                 <ArrowRight className="w-4 h-4 text-[#C5FF00]" />
               </span>
@@ -384,7 +378,7 @@ function Footer({ dark }: { dark: boolean }) {
             ))}
           </div>
         </FadeUp>
-        <div className="flex items-center py-6 text-xs text-white/20">
+        <div className="flex items-center py-6 text-xs text-white/20 [&_p]:m-0">
           <span dangerouslySetInnerHTML={renderHTML(get('footer', 'copyright'))} />
         </div>
       </div>
@@ -395,7 +389,6 @@ function Footer({ dark }: { dark: boolean }) {
   )
 }
 
-// ─── App ──────────────────────────────────────────────────────────────────────
 const BLUR_LAYERS = [
   { blur: 1,  start: 0,   end: 16  }, { blur: 2,  start: 8,   end: 28  },
   { blur: 4,  start: 18,  end: 42  }, { blur: 8,  start: 30,  end: 58  },
