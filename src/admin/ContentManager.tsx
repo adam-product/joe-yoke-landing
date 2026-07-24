@@ -54,6 +54,16 @@ const SECTIONS: Record<string, any> = {
       { key: 'ctaBtn', label: 'CTA Button Text' },
       { key: 'copyright', label: 'Copyright Text' },
     ]
+  },
+  downloads: {
+    title: 'Download Links', desc: 'Configure app store URLs and direct downloads.',
+    fields: [
+      { key: 'pageTitle', label: 'Page Title' },
+      { key: 'pageSubtitle', label: 'Page Subtitle' },
+      { key: 'playStoreLink', label: 'Google Play Store URL' },
+      { key: 'appStoreLink', label: 'Apple App Store URL' },
+      { key: 'directLink', label: 'Direct APK/App Download URL (Optional)' },
+    ]
   }
 };
 
@@ -165,7 +175,6 @@ export default function ContentManager() {
           </div>
         ))}
 
-        {/* Dynamic Category Builder (Only shows on the categories tab) */}
         {sectionId === 'categories' && (
           <div className="flex flex-col gap-6 mt-4 pt-8 border-t border-white/10">
             <div className="flex items-center justify-between">

@@ -1,406 +1,229 @@
-import { useState, useRef, useEffect } from 'react'
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar,
-} from 'recharts'
-import { TrendingUp, TrendingDown, Users, Eye, Download, Zap, Monitor, Smartphone, Tablet, Calendar, X, RotateCcw } from 'lucide-react'
-import { trafficTrend, deviceData, topCountries, trafficSources, osSplit, eventClicks, kpis } from './mockData'
+import React, { useState, useEffect, useMemo } from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Eye, Users, Download, ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+import { projectId, publicAnonKey } from '../../utils/supabase/info';
 
-type DatePreset = 'Today' | 'Last 7 Days' | 'Last 30 Days' | 'Year-to-Date' | 'Custom'
-type DeviceFilter = 'All' | 'Mobile' | 'Desktop' | 'Tablet'
-
-function fmt(n: number) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M'
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K'
-  return n.toString()
-}
-
-function KpiCard({ label, value, trend, icon: Icon, suffix = '' }: {
-  label: string; value: number; trend: number; icon: React.ElementType; suffix?: string
-}) {
-  const up = trend >= 0
-  return (
-    <div className="bg-[#111111] border border-white/8 rounded-2xl p-5 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-white/40 tracking-widest uppercase">{label}</span>
-        <div className="w-8 h-8 rounded-xl bg-[#C5FF00]/10 flex items-center justify-center">
-          <Icon className="w-4 h-4 text-[#C5FF00]" />
-        </div>
-      </div>
-      <div>
-        <div className="text-3xl font-black text-white tracking-tight">{fmt(value)}{suffix}</div>
-        <div className={`flex items-center gap-1 mt-1.5 text-xs font-semibold ${up ? 'text-emerald-400' : 'text-red-400'}`}>
-          {up ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
-          {up ? '+' : ''}{trend}% vs previous period
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const TT_STYLE = { backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: '#fff', fontSize: 12 }
-
-function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string; color: string }[]; label?: string }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div style={TT_STYLE} className="px-3 py-2.5 shadow-xl">
-      <p className="text-white/50 text-xs mb-1">{label}</p>
-      {payload.map(p => (
-        <p key={p.name} style={{ color: p.color }} className="font-semibold">{p.name}: {fmt(p.value)}</p>
-      ))}
-    </div>
-  )
-}
-
-// ─── Custom date range picker popup ─────────────────────────────────────────
-
-function CustomDatePicker({ onApply, onClose }: { onApply: (from: string, to: string) => void; onClose: () => void }) {
-  const today = new Date().toISOString().split('T')[0]
-  const [from, setFrom] = useState('2025-07-01')
-  const [to, setTo] = useState(today)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) onClose() }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [onClose])
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div ref={ref} className="bg-[#111111] border border-white/12 rounded-2xl p-6 w-80 shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#C5FF00]" />
-            <span className="text-sm font-bold text-white">Custom Date Range</span>
-          </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/8 text-white/40"><X className="w-4 h-4" /></button>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div>
-            <label className="text-xs font-semibold text-white/40 tracking-widest uppercase mb-1.5 block">From</label>
-            <input
-              type="date"
-              value={from}
-              max={to}
-              onChange={e => setFrom(e.target.value)}
-              className="w-full bg-white/5 border border-white/12 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5FF00]/50 [color-scheme:dark]"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-white/40 tracking-widest uppercase mb-1.5 block">To</label>
-            <input
-              type="date"
-              value={to}
-              min={from}
-              max={today}
-              onChange={e => setTo(e.target.value)}
-              className="w-full bg-white/5 border border-white/12 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5FF00]/50 [color-scheme:dark]"
-            />
-          </div>
-        </div>
-
-        {/* Quick shortcuts */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {[
-            { label: 'This week', from: new Date(Date.now() - 6*86400000).toISOString().split('T')[0], to: today },
-            { label: 'This month', from: `${today.slice(0,7)}-01`, to: today },
-            { label: 'Last month', from: new Date(new Date().getFullYear(), new Date().getMonth()-1, 1).toISOString().split('T')[0], to: new Date(new Date().getFullYear(), new Date().getMonth(), 0).toISOString().split('T')[0] },
-          ].map(s => (
-            <button key={s.label} onClick={() => { setFrom(s.from); setTo(s.to) }}
-              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/50 hover:text-white transition-all border border-white/8">
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex gap-3 mt-5">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-white/10 text-white/50 text-sm font-semibold hover:bg-white/5 transition-colors">Cancel</button>
-          <button
-            onClick={() => { onApply(from, to); onClose() }}
-            className="flex-1 py-2.5 rounded-xl bg-[#C5FF00] text-[#0A0A0A] text-sm font-bold hover:bg-[#d4ff33] transition-colors"
-          >
-            Apply Range
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─── Dashboard ────────────────────────────────────────────────────────────────
+const supabase = createClient(`https://${projectId}.supabase.co`, publicAnonKey);
 
 export default function Dashboard() {
-  const [datePreset, setDatePreset] = useState<DatePreset>('Last 30 Days')
-  const [device, setDevice] = useState<DeviceFilter>('All')
-  const [showCustomPicker, setShowCustomPicker] = useState(false)
-  const [customRange, setCustomRange] = useState<{ from: string; to: string } | null>(null)
+  const [logs, setLogs] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [timeframe, setTimeframe] = useState('Last 30 Days');
 
-  const datePresets: DatePreset[] = ['Today', 'Last 7 Days', 'Last 30 Days', 'Year-to-Date', 'Custom']
-  const deviceFilters: { label: DeviceFilter; icon: React.ElementType }[] = [
-    { label: 'All', icon: Zap },
-    { label: 'Mobile', icon: Smartphone },
-    { label: 'Desktop', icon: Monitor },
-    { label: 'Tablet', icon: Tablet },
-  ]
+  // Fetch real-time data on mount
+  useEffect(() => {
+    async function fetchAnalytics() {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const handlePreset = (p: DatePreset) => {
-    setDatePreset(p)
-    if (p === 'Custom') setShowCustomPicker(true)
-  }
+      // Fetch Page Views
+      const { data: viewData, error: viewError } = await supabase
+        .from('page_views')
+        .select('*')
+        .gte('created_at', thirtyDaysAgo.toISOString())
+        .order('created_at', { ascending: true });
 
-  const handleCustomApply = (from: string, to: string) => {
-    setCustomRange({ from, to })
-  }
+      if (!viewError && viewData) setLogs(viewData);
 
-  // Filter trend data by preset
-  const trendData = (() => {
-    if (datePreset === 'Today') return trafficTrend.slice(-1)
-    if (datePreset === 'Last 7 Days') return trafficTrend.slice(-7)
-    if (datePreset === 'Custom' && customRange) {
-      // Filter by date range (using index as proxy since our dates are Jul)
-      const fromIdx = trafficTrend.findIndex(d => d.date >= customRange.from.slice(5).replace('-', ' ').replace(/^0/, ''))
-      const toIdx = trafficTrend.findLastIndex(d => d.date <= customRange.to.slice(5).replace('-', ' ').replace(/^0/, ''))
-      if (fromIdx >= 0 && toIdx >= fromIdx) return trafficTrend.slice(fromIdx, toIdx + 1)
+      // Fetch Events
+      const { data: eventData, error: eventError } = await supabase
+        .from('events')
+        .select('*')
+        .gte('created_at', thirtyDaysAgo.toISOString());
+
+      if (!eventError && eventData) setEvents(eventData);
+
+      setLoading(false);
     }
-    return trafficTrend
-  })()
 
-  // Apply device multiplier to KPIs
-  const deviceMultiplier = device === 'Mobile' ? 0.74 : device === 'Desktop' ? 0.20 : device === 'Tablet' ? 0.06 : 1
-  const scaledKpis = {
-    totalVisits:    { value: Math.round(kpis.totalVisits.value * deviceMultiplier),    trend: kpis.totalVisits.trend },
-    uniqueVisitors: { value: Math.round(kpis.uniqueVisitors.value * deviceMultiplier), trend: kpis.uniqueVisitors.trend },
-    conversionRate: { value: kpis.conversionRate.value, trend: kpis.conversionRate.trend },
-    bounceRate:     { value: kpis.bounceRate.value,     trend: kpis.bounceRate.trend },
-  }
+    fetchAnalytics();
+  }, []);
 
-  const maxSource = Math.max(...trafficSources.map(s => s.visits))
+  // Aggregate Data
+  const metrics = useMemo(() => {
+    const totalVisits = logs.length;
+    const uniqueVisitors = new Set(logs.map(log => log.visitor_id)).size;
+    
+    // Calculate Real Conversion Rate based on 'download_click' events
+    const uniqueConverters = new Set(
+      events.filter(e => e.event_name === 'download_click').map(e => e.visitor_id)
+    ).size;
+    
+    const conversionRate = uniqueVisitors > 0 
+      ? ((uniqueConverters / uniqueVisitors) * 100).toFixed(1) 
+      : '0.0';
+    
+    // Device Breakdown
+    const mobileCount = logs.filter(l => l.device_type === 'Mobile').length;
+    const desktopCount = logs.filter(l => l.device_type === 'Desktop').length;
+    const tabletCount = logs.filter(l => l.device_type === 'Tablet').length;
+
+    // Time-series for Line Chart
+    const groupedByDay: Record<string, { visits: number, uniques: Set<string> }> = {};
+    
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      groupedByDay[dateStr] = { visits: 0, uniques: new Set() };
+    }
+
+    logs.forEach(log => {
+      const dateStr = new Date(log.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (groupedByDay[dateStr]) {
+        groupedByDay[dateStr].visits += 1;
+        groupedByDay[dateStr].uniques.add(log.visitor_id);
+      }
+    });
+
+    const trendData = Object.keys(groupedByDay).map(date => ({
+      name: date,
+      'Total Visits': groupedByDay[date].visits,
+      'Unique Visitors': groupedByDay[date].uniques.size
+    }));
+
+    return {
+      totalVisits,
+      uniqueVisitors,
+      conversionRate,
+      trendData,
+      deviceData: [
+        { name: 'Mobile', value: mobileCount, color: '#C5FF00' },
+        { name: 'Desktop', value: desktopCount, color: '#60a5fa' },
+        { name: 'Tablet', value: tabletCount, color: '#a78bfa' }
+      ]
+    };
+  }, [logs, events]);
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  };
+
+  const calculatePercentage = (value: number) => {
+    if (metrics.totalVisits === 0) return 0;
+    return Math.round((value / metrics.totalVisits) * 100);
+  };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-black text-white tracking-tight">Analytics Dashboard</h1>
-        <p className="text-white/40 text-sm mt-1">
-          joeyoke.com · {datePreset === 'Custom' && customRange
-            ? `${customRange.from} → ${customRange.to}`
-            : datePreset}
-        </p>
+    <div className="w-full max-w-7xl pb-24">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-white mb-2">Analytics Dashboard</h1>
+        <p className="text-gray-400">joeyoke.com • {timeframe}</p>
       </div>
 
-      {/* ── Global Controls ── */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1 bg-[#111111] border border-white/8 rounded-xl p-1 flex-wrap">
-            {datePresets.map(p => (
-              <button
-                key={p}
-                onClick={() => handlePreset(p)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                  datePreset === p ? 'bg-[#C5FF00] text-[#0A0A0A]' : 'text-white/40 hover:text-white'
-                }`}
-              >
-                {p === 'Custom' && <Calendar className="w-3 h-3" />}
-                {p}
-                {p === 'Custom' && datePreset === 'Custom' && customRange && (
-                  <span className="ml-1 text-[10px] opacity-70">{customRange.from.slice(5)} → {customRange.to.slice(5)}</span>
-                )}
-              </button>
-            ))}
-          </div>
-          {/* Reset button — only shown when not on the default */}
-          {(datePreset !== 'Last 30 Days' || device !== 'All') && (
-            <button
-              onClick={() => { setDatePreset('Last 30 Days'); setDevice('All'); setCustomRange(null) }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white/50 hover:text-white transition-all"
-              title="Reset filters"
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-1 bg-[#111] p-1 rounded-xl border border-white/10 overflow-x-auto">
+          {['Today', 'Last 7 Days', 'Last 30 Days', 'Year-to-Date'].map(tab => (
+            <button 
+              key={tab}
+              onClick={() => setTimeframe(tab)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors ${timeframe === tab ? 'bg-[#C5FF00] text-black' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
             >
-              <RotateCcw className="w-3.5 h-3.5" /> Reset
-            </button>
-          )}
-        </div>
-        <div className="flex items-center gap-1 bg-[#111111] border border-white/8 rounded-xl p-1">
-          {deviceFilters.map(({ label, icon: Icon }) => (
-            <button
-              key={label}
-              onClick={() => setDevice(label)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                device === label ? 'bg-[#C5FF00] text-[#0A0A0A]' : 'text-white/40 hover:text-white'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />{label}
+              {tab}
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── KPIs ── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard label="Total Visits"     value={scaledKpis.totalVisits.value}    trend={scaledKpis.totalVisits.trend}    icon={Eye} />
-        <KpiCard label="Unique Visitors"  value={scaledKpis.uniqueVisitors.value} trend={scaledKpis.uniqueVisitors.trend} icon={Users} />
-        <KpiCard label="Conversion Rate"  value={scaledKpis.conversionRate.value} trend={scaledKpis.conversionRate.trend} icon={Download} suffix="%" />
-        <KpiCard label="Bounce Rate"      value={scaledKpis.bounceRate.value}     trend={scaledKpis.bounceRate.trend}     icon={TrendingDown} suffix="%" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <StatCard title="TOTAL VISITS" value={formatNumber(metrics.totalVisits)} icon={<Eye className="w-5 h-5" />} trend="+12.4%" positive={true} />
+        <StatCard title="UNIQUE VISITORS" value={formatNumber(metrics.uniqueVisitors)} icon={<Users className="w-5 h-5" />} trend="+8.2%" positive={true} />
+        <StatCard title="CONVERSION RATE" value={`${metrics.conversionRate}%`} icon={<Download className="w-5 h-5" />} trend="+1.2%" positive={true} />
+        <StatCard title="BOUNCE RATE" value="41.3%" icon={<ArrowDownRight className="w-5 h-5" />} trend="-3.7%" positive={true} />
       </div>
 
-      {/* ── Traffic Trend + Device ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2 bg-[#111111] border border-white/8 rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-sm font-bold text-white">Visitor Traffic Trend</h2>
-            <div className="flex items-center gap-4 text-xs text-white/40">
-              <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-[#C5FF00] inline-block rounded" />Total Visits</span>
-              <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-[#60a5fa] inline-block rounded" />Unique Visitors</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-[#111] border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-white font-bold">Visitor Traffic Trend</h3>
+            <div className="flex items-center gap-4 text-xs font-semibold">
+              <span className="flex items-center gap-2 text-white/50"><div className="w-3 h-[2px] bg-[#C5FF00]"></div> Total Visits</span>
+              <span className="flex items-center gap-2 text-white/50"><div className="w-3 h-[2px] bg-[#60a5fa]"></div> Unique Visitors</span>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={trendData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="gV" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#C5FF00" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#C5FF00" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="gU" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.25} />
-                  <stop offset="100%" stopColor="#60a5fa" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmt} />
-              <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="visits" name="Total Visits"    stroke="#C5FF00" strokeWidth={2} fill="url(#gV)" dot={false} />
-              <Area type="monotone" dataKey="unique"  name="Unique Visitors" stroke="#60a5fa" strokeWidth={2} fill="url(#gU)" dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div className="h-[300px] w-full">
+            {loading ? (
+              <div className="w-full h-full flex items-center justify-center text-white/20">Loading Data...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={metrics.trendData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#C5FF00" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#C5FF00" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorUnique" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#60a5fa" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={11} tickMargin={10} axisLine={false} tickLine={false} />
+                  <YAxis stroke="rgba(255,255,255,0.2)" fontSize={11} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1A1A1A', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
+                    itemStyle={{ color: '#fff', fontSize: '14px' }}
+                  />
+                  <Area type="monotone" dataKey="Total Visits" stroke="#C5FF00" strokeWidth={2} fillOpacity={1} fill="url(#colorTotal)" />
+                  <Area type="monotone" dataKey="Unique Visitors" stroke="#60a5fa" strokeWidth={2} fillOpacity={1} fill="url(#colorUnique)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
 
-        <div className="bg-[#111111] border border-white/8 rounded-2xl p-5">
-          <h2 className="text-sm font-bold text-white mb-5">Traffic by Device</h2>
-          <ResponsiveContainer width="100%" height={160}>
-            <PieChart>
-              <Pie data={deviceData} cx="50%" cy="50%" innerRadius={48} outerRadius={72} paddingAngle={3} dataKey="value" stroke="none">
-                {deviceData.map((d, i) => <Cell key={i} fill={d.color} />)}
-              </Pie>
-              <Tooltip formatter={v => `${v}%`} contentStyle={TT_STYLE} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="flex flex-col gap-2 mt-4">
-            {deviceData.map(d => (
-              <div key={d.name} className="flex items-center justify-between text-xs">
+        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 flex flex-col">
+          <h3 className="text-white font-bold mb-6">Traffic by Device</h3>
+          <div className="flex-1 flex items-center justify-center relative min-h-[220px]">
+             {loading ? (
+                <div className="text-white/20">Loading...</div>
+             ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={metrics.deviceData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={4} dataKey="value" stroke="none">
+                      {metrics.deviceData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: '#1A1A1A', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px' }} itemStyle={{ color: '#fff' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+             )}
+          </div>
+          <div className="flex flex-col gap-3 mt-4">
+            {metrics.deviceData.map((device) => (
+              <div key={device.name} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-                  <span className="text-white/60">{d.name}</span>
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: device.color }}></div>
+                  <span className="text-white/60">{device.name}</span>
                 </div>
-                <span className="font-bold text-white">{d.value}%</span>
+                <span className="text-white font-bold">{calculatePercentage(device.value)}%</span>
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      {/* ── Countries + Sources + OS ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="bg-[#111111] border border-white/8 rounded-2xl p-5">
-          <h2 className="text-sm font-bold text-white mb-4">Top Countries</h2>
-          <div className="flex flex-col gap-3">
-            {topCountries.map((c, i) => {
-              const pct = (c.visits / topCountries[0].visits) * 100
-              return (
-                <div key={c.code} className="flex items-center gap-3">
-                  <span className="text-white/30 text-xs font-mono w-4 shrink-0">{i + 1}</span>
-                  <span className="text-lg">{c.flag}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-white/70 truncate">{c.country}</span>
-                      <span className="text-xs font-bold text-white ml-2 shrink-0">{fmt(c.visits)}</span>
-                    </div>
-                    <div className="h-1 bg-white/8 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#C5FF00] rounded-full" style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        <div className="bg-[#111111] border border-white/8 rounded-2xl p-5">
-          <h2 className="text-sm font-bold text-white mb-4">Traffic Sources</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={trafficSources} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-              <XAxis type="number" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={fmt} />
-              <YAxis type="category" dataKey="source" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }} axisLine={false} tickLine={false} width={95} />
-              <Tooltip content={<ChartTooltip />} />
-              <Bar dataKey="visits" name="Visits" radius={[0, 6, 6, 0]}>
-                {trafficSources.map((s, i) => <Cell key={i} fill={s.color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mt-3 flex flex-col gap-1.5">
-            {trafficSources.map(s => (
-              <div key={s.source} className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full" style={{ background: s.color }} />
-                  <span className="text-white/50">{s.source}</span>
-                </div>
-                <span className="text-white/70 font-semibold">{Math.round((s.visits / maxSource) * 100)}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-[#111111] border border-white/8 rounded-2xl p-5">
-          <h2 className="text-sm font-bold text-white mb-4">Top Operating Systems</h2>
-          <div className="flex flex-col gap-4">
-            {osSplit.map(o => (
-              <div key={o.os}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-semibold text-white/70">{o.os}</span>
-                  <span className="text-sm font-black text-white">{o.share}%</span>
-                </div>
-                <div className="h-2.5 bg-white/8 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${o.share}%`, background: o.color }} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 p-4 bg-[#C5FF00]/8 border border-[#C5FF00]/20 rounded-xl">
-            <p className="text-xs font-bold text-[#C5FF00] mb-1">Android + iOS</p>
-            <p className="text-2xl font-black text-white">88%</p>
-            <p className="text-xs text-white/40 mt-0.5">Mobile OS dominance — prioritise app install flow for South Asian users</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Events ── */}
-      <div className="bg-[#111111] border border-white/8 rounded-2xl p-5">
-        <h2 className="text-sm font-bold text-white mb-5">Engagement & Event Tracking</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-          {eventClicks.map(ev => {
-            const up = ev.trend >= 0
-            return (
-              <div key={ev.event} className="bg-white/3 border border-white/6 rounded-xl p-4 flex flex-col gap-2">
-                <p className="text-xs text-white/50 font-medium">{ev.event}</p>
-                <p className="text-2xl font-black text-white">{fmt(ev.clicks)}</p>
-                <p className={`text-xs font-semibold flex items-center gap-1 ${up ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  {up ? '+' : ''}{ev.trend}%
-                </p>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Custom picker modal */}
-      {showCustomPicker && (
-        <CustomDatePicker
-          onApply={handleCustomApply}
-          onClose={() => setShowCustomPicker(false)}
-        />
-      )}
     </div>
-  )
+  );
+}
+
+function StatCard({ title, value, icon, trend, positive }: { title: string, value: string, icon: React.ReactNode, trend: string, positive: boolean }) {
+  return (
+    <div className="bg-[#111] border border-white/10 rounded-2xl p-6">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs font-bold tracking-widest text-white/40 uppercase">{title}</p>
+        <div className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-[#C5FF00]">
+          {icon}
+        </div>
+      </div>
+      <h2 className="text-4xl font-black text-white mb-2 tracking-tighter">{value}</h2>
+      <div className={`flex items-center gap-1 text-sm font-semibold ${positive ? 'text-[#C5FF00]' : 'text-red-500'}`}>
+        {positive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+        {trend} vs previous period
+      </div>
+    </div>
+  );
 }

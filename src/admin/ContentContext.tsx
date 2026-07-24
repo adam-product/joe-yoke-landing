@@ -23,7 +23,6 @@ const DEFAULT_CONTENT: Record<string, any> = {
   categories: {
     subhead: "Browse by",
     headline: "Game Categories",
-    // Changed to an array for dynamic adding/removing
     categoryList: [
       { title: "Action & Arcade", tags: "Fast-paced / Combat / 3D" },
       { title: "Puzzle & Brain", tags: "Logic / Wordplay / Strategy" },
@@ -44,12 +43,19 @@ const DEFAULT_CONTENT: Record<string, any> = {
     ctaTagline: "Let's play.",
     ctaBtn: "Download App",
     copyright: "© 2026 Joe Yoke. All rights reserved."
+  },
+  downloads: {
+    pageTitle: "Get Joe Yoke",
+    pageSubtitle: "Choose your platform to start playing.",
+    playStoreLink: "https://play.google.com/store",
+    appStoreLink: "https://apple.com/app-store",
+    directLink: "" 
   }
 };
 
 interface ContentContextType {
   content: Record<string, any>;
-  get: (section: string, field: string) => any; // Changed to 'any' to safely return arrays
+  get: (section: string, field: string) => any;
   updateContent: (sectionOrFull: any, possibleData?: any) => Promise<void>;
   loading: boolean;
 }

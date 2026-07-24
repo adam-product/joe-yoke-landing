@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { ArrowRight, ArrowUpRight, Sun, Moon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { createClient } from '@supabase/supabase-js'
+import { projectId, publicAnonKey } from '../utils/supabase/info'
 import pyramidImg from '@/imports/hero.png'
 import faviconImg from '@/imports/favicon.ico-1.jpg'
 import gameImg1 from '@/imports/photo_2026-07-23_20-54-30.jpg'
@@ -10,6 +12,20 @@ import gameImg3 from '@/imports/photo_2026-07-23_20-54-21.jpg'
 import gameImg4 from '@/imports/photo_2026-07-23_20-54-19.jpg'
 import { useGames } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
+
+const supabaseUrl = `https://${projectId}.supabase.co`;
+const supabase = createClient(supabaseUrl, publicAnonKey);
+
+export const trackEvent = async (eventName: string) => {
+  const visitorId = localStorage.getItem('joeyoke_visitor_id');
+  if (!visitorId) return; 
+
+  await supabase.from('events').insert([{
+    event_name: eventName,
+    visitor_id: visitorId,
+    path: window.location.pathname
+  }]);
+};
 
 interface Game { badge: string; title: string; description: string; id: number; image: string; }
 interface Category { index: string; title: string; tags: string; }
@@ -139,22 +155,25 @@ function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v:
 
 function Hero({ dark }: { dark: boolean }) {
   const { get } = useContent()
+  const navigate = useNavigate()
   const heroSrc = get('hero', 'heroImage') || pyramidImg
 
   return (
     <section className={`min-h-screen flex items-center px-4 sm:px-6 md:px-12 pt-24 md:pt-20 pb-16 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8 overflow-hidden">
-        
         <div className="w-full md:w-3/5 lg:w-2/3 flex flex-col gap-6 md:gap-8 z-10 shrink-0 min-w-0">
           <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.9, ease, delay: 0.1 }}>
             <div className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tighter transition-colors duration-500 break-words w-full [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('hero', 'headline'))} />
           </motion.div>
-
-          {/* FIX: Added w-full, break-words, and [&_p]:m-0 to the subtext container to force wrapping */}
           <motion.div className={`w-full max-w-md break-words text-base md:text-lg leading-relaxed transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }} dangerouslySetInnerHTML={renderHTML(get('hero', 'subtext'))} />
-
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.45 }}>
-            <button className={`group flex items-center gap-3 rounded-full pl-6 pr-2 py-2 font-semibold text-sm transition-colors w-fit ${dark ? 'bg-white text-[#0A0A0A] hover:bg-white/90' : 'bg-[#1A1A1A] text-white hover:bg-[#0A0A0A]'}`}>
+            <button 
+              onClick={() => {
+                trackEvent('download_page_click');
+                navigate('/download');
+              }}
+              className={`group flex items-center gap-3 rounded-full pl-6 pr-2 py-2 font-semibold text-sm transition-colors w-fit ${dark ? 'bg-white text-[#0A0A0A] hover:bg-white/90' : 'bg-[#1A1A1A] text-white hover:bg-[#0A0A0A]'}`}
+            >
               <span dangerouslySetInnerHTML={renderHTML(get('hero', 'ctaLabel'))} />
               <span className="w-8 h-8 rounded-full bg-[#C5FF00] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300">
                 <ArrowRight className="w-4 h-4 text-[#1A1A1A]" />
@@ -162,7 +181,6 @@ function Hero({ dark }: { dark: boolean }) {
             </button>
           </motion.div>
         </div>
-
         <div className="w-full md:w-2/5 lg:w-1/3 flex items-center justify-center md:justify-end">
           <motion.div animate={{ y: [0, -22, 0] }} transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}>
             <motion.div initial={{ opacity: 0, scale: 0.85, rotate: -8 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>
@@ -170,7 +188,6 @@ function Hero({ dark }: { dark: boolean }) {
             </motion.div>
           </motion.div>
         </div>
-        
       </div>
     </section>
   )
@@ -182,10 +199,8 @@ function About({ dark }: { dark: boolean }) {
 
   return (
     <section className={`py-16 md:py-20 px-4 sm:px-6 md:px-12 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
-      {/* Added w-full to ensure container takes up available space but respects padding */}
       <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-10 md:gap-12">
         <FadeUp className="w-full">
-          {/* Added w-full and break-words so the text wraps instead of bursting out */}
           <div className={`w-full break-words text-xl sm:text-2xl md:text-3xl text-center leading-snug font-medium transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/60' : 'text-[#1A1A1A]/70'}`} dangerouslySetInnerHTML={renderHTML(get('about', 'quote'))} />
         </FadeUp>
         <FadeUp delay={0.1}>
@@ -328,16 +343,16 @@ function CommunityStats({ dark }: { dark: boolean }) {
     <section id="community" className={`py-16 md:py-20 px-4 sm:px-6 md:px-12 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <div className="max-w-7xl mx-auto">
         <FadeUp>
-          {/* Added overflow-hidden to ensure internal elements cannot force this card wider than the screen */}
           <div className={`w-full rounded-3xl p-6 sm:p-10 md:p-14 border transition-colors duration-500 overflow-hidden ${dark ? 'bg-[#111111] border-white/5' : 'bg-[#0A0A0A] border-white/5'}`}>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-10 mb-10 md:mb-14 w-full">
-              {/* Added min-w-0 and flex-1 so text respects the flex boundary */}
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] md:text-xs font-bold text-white/30 tracking-widest uppercase mb-3 md:mb-4">Our Community</p>
-                {/* Added w-full and break-words to ensure text drops down instead of pushing right */}
                 <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter leading-[1.1] break-words w-full [&_p]:m-0" dangerouslySetInnerHTML={renderHTML(get('stats', 'headline'))} />
               </div>
-              <button className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0">
+              <button 
+                onClick={() => trackEvent('join_discord_click')}
+                className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
+              >
                 <span dangerouslySetInnerHTML={renderHTML(get('stats', 'ctaLabel'))} className="[&_p]:m-0" />
                 <span className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300 shrink-0">
                   <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-[#C5FF00]" />
@@ -363,6 +378,7 @@ function CommunityStats({ dark }: { dark: boolean }) {
 
 function Footer({ dark }: { dark: boolean }) {
   const { get } = useContent()
+  const navigate = useNavigate()
 
   return (
     <footer id="download" className={`pt-16 md:pt-20 pb-0 px-4 sm:px-6 md:px-12 overflow-hidden transition-colors duration-500 ${dark ? 'bg-[#050505]' : 'bg-[#0A0A0A]'}`}>
@@ -373,7 +389,13 @@ function Footer({ dark }: { dark: boolean }) {
               <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaHeadline'))} />
               <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaTagline'))} />
             </div>
-            <button className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 md:py-2.5 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0">
+            <button 
+              onClick={() => {
+                trackEvent('download_page_click');
+                navigate('/download');
+              }}
+              className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 md:py-2.5 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
+            >
               <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaBtn'))} className="[&_p]:m-0" />
               <span className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300 shrink-0">
                 <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-[#C5FF00]" />
@@ -435,6 +457,32 @@ function LiquidGlassBar({ dark }: { dark: boolean }) {
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false)
+
+  useEffect(() => {
+    const trackVisit = async () => {
+      let visitorId = localStorage.getItem('joeyoke_visitor_id');
+      if (!visitorId) {
+        visitorId = crypto.randomUUID();
+        localStorage.setItem('joeyoke_visitor_id', visitorId);
+      }
+      const ua = navigator.userAgent;
+      let deviceType = 'Desktop';
+      if (/mobile|android|iphone/i.test(ua)) deviceType = 'Mobile';
+      else if (/tablet|ipad/i.test(ua)) deviceType = 'Tablet';
+
+      await supabase.from('page_views').insert([{
+        path: window.location.pathname,
+        device_type: deviceType,
+        visitor_id: visitorId
+      }]);
+    };
+    
+    if (!sessionStorage.getItem('joeyoke_tracked')) {
+      trackVisit();
+      sessionStorage.setItem('joeyoke_tracked', 'true');
+    }
+  }, []);
+
   return (
     <div className="font-sans antialiased overflow-x-hidden w-full relative">
       <Header darkMode={darkMode} setDarkMode={setDarkMode} />
