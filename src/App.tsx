@@ -24,13 +24,6 @@ const GAMES: Game[] = [
   { id: 4, badge: 'PARTY', title: "Liar's Dice", description: 'Bluff your way to victory. Roll, bet, and deceive — the last one with dice standing wins.', image: gameImg4 },
 ]
 
-const CATEGORIES: Category[] = [
-  { index: '01', title: 'Action & Arcade', tags: 'Fast-paced / Combat / 3D' },
-  { index: '02', title: 'Puzzle & Brain', tags: 'Logic / Wordplay / Strategy' },
-  { index: '03', title: 'Party & Social', tags: 'Multiplayer / Trivia / Bluffing' },
-  { index: '04', title: 'Sports & Racing', tags: 'Competitive / Real-time / Leaderboard' },
-]
-
 const FOOTER_LINKS = [
   { heading: 'Product', links: ['Games', 'Community', 'Leaderboard', 'App Store'] },
   { heading: 'Support', links: ['Help Center', 'Contact Us', 'Privacy Policy', 'Terms'] },
@@ -50,10 +43,8 @@ function FadeUp({ children, delay = 0, className, dark }: { children: ReactNode;
   )
 }
 
-// Fixed HTML Parser: Allows formatting and paragraph tags to preserve line breaks
 const renderHTML = (html: string) => {
   if (!html) return { __html: '' };
-  // Convert standard \n to <br> if it hasn't been formatted by Quill yet
   if (!html.includes('<p>') && html.includes('\n')) {
     return { __html: html.replace(/\n/g, '<br/>') };
   }
@@ -146,7 +137,6 @@ function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v:
   )
 }
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
 function Hero({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const heroSrc = get('hero', 'heroImage') || pyramidImg
@@ -155,7 +145,7 @@ function Hero({ dark }: { dark: boolean }) {
     <section className={`min-h-screen flex items-center px-6 md:px-12 pt-20 pb-16 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8 overflow-hidden">
         
-        {/* Left Side: Takes up 60% on tablet, 66% on desktop for wider text breathing room */}
+        {/* Left Side: Layout split for optimal text spacing */}
         <div className="w-full md:w-3/5 lg:w-2/3 flex flex-col gap-8 z-10 shrink-0">
           <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.9, ease, delay: 0.1 }}>
             <div className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tighter transition-colors duration-500 break-words [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('hero', 'headline'))} />
@@ -173,7 +163,7 @@ function Hero({ dark }: { dark: boolean }) {
           </motion.div>
         </div>
 
-        {/* Right Side: Takes up 40% on tablet, 33% on desktop, pushed to the far right */}
+        {/* Right Side: Push Mockup to edge */}
         <div className="w-full md:w-2/5 lg:w-1/3 flex items-center justify-center md:justify-end">
           <motion.div animate={{ y: [0, -22, 0] }} transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}>
             <motion.div initial={{ opacity: 0, scale: 0.85, rotate: -8 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>
@@ -181,7 +171,6 @@ function Hero({ dark }: { dark: boolean }) {
             </motion.div>
           </motion.div>
         </div>
-        
       </div>
     </section>
   )
@@ -233,10 +222,7 @@ function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boo
             </button>
           </div>
 
-          {/* Bottom Overlay with Progressive Blur */}
           <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-2 px-5 pb-5 pt-16">
-            
-            {/* The Blur + Gradient Layer (Masked to fade in smoothly) */}
             <div className="absolute inset-0 z-0 pointer-events-none" style={{
               background: 'linear-gradient(to bottom, transparent 0%, rgba(8,8,10,0.6) 40%, rgba(8,8,10,0.95) 100%)',
               backdropFilter: 'blur(16px)',
@@ -245,13 +231,11 @@ function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boo
               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 40%)'
             }} />
             
-            {/* The Text Content (z-10 to sit on top of the blur) */}
             <h3 className="relative z-10 text-white text-xl font-black tracking-tight leading-tight">{game.title}</h3>
             <p className="relative z-10 text-white/75 text-sm leading-relaxed">{game.description}</p>
             <a href="#" className="relative z-10 group/link inline-flex items-center gap-1.5 text-sm font-semibold tracking-wide hover:gap-3 transition-all duration-200 mt-1" style={{ color: accent }}>
               VIEW DETAILS <ArrowRight className="w-4 h-4" />
             </a>
-            
           </div>
         </div>
       </div>
@@ -294,8 +278,8 @@ function CategoryRow({ cat, delay, dark }: { cat: Category; delay: number; dark:
       <div className={`group flex items-center justify-between px-6 md:px-8 py-6 cursor-pointer transition-all duration-150 rounded-xl ${hovered ? 'bg-[#C5FF00]' : ''} ${dark ? 'border-t border-white/10 last:border-b' : 'border-t border-[#E5E7EB] last:border-b'}`} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
         <div className="flex items-center gap-6 md:gap-10 min-w-0">
           <span className={`text-sm font-mono font-bold shrink-0 transition-colors duration-150 ${hovered ? 'text-[#1A1A1A]/50' : dark ? 'text-white/30' : 'text-[#1A1A1A]/30'}`}>{cat.index}</span>
-          <span className={`text-xl md:text-2xl font-black tracking-tight transition-colors duration-150 ${hovered ? 'text-[#1A1A1A]' : dark ? 'text-white' : 'text-[#1A1A1A]'}`}>{cat.title}</span>
-          <span className={`hidden sm:block text-sm transition-colors duration-150 ${hovered ? 'text-[#1A1A1A]/60' : dark ? 'text-white/30' : 'text-[#1A1A1A]/40'}`}>{cat.tags}</span>
+          <div className={`text-xl md:text-2xl font-black tracking-tight transition-colors duration-150 [&_p]:m-0 ${hovered ? 'text-[#1A1A1A]' : dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(cat.title)} />
+          <div className={`hidden sm:block text-sm transition-colors duration-150 [&_p]:m-0 ${hovered ? 'text-[#1A1A1A]/60' : dark ? 'text-white/30' : 'text-[#1A1A1A]/40'}`} dangerouslySetInnerHTML={renderHTML(cat.tags)} />
         </div>
         <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-200 ${hovered ? 'bg-[#1A1A1A] border-[#1A1A1A] scale-110' : dark ? 'border-white/20 bg-transparent' : 'border-[#1A1A1A]/20 bg-transparent'}`}>
           <ArrowUpRight className={`w-4 h-4 transition-colors duration-150 ${hovered ? 'text-[#C5FF00]' : dark ? 'text-white/40' : 'text-[#1A1A1A]/40'}`} />
@@ -306,17 +290,25 @@ function CategoryRow({ cat, delay, dark }: { cat: Category; delay: number; dark:
 }
 
 function Categories({ dark }: { dark: boolean }) {
+  const { get } = useContent()
+  
+  const categoriesData: Category[] = [1, 2, 3, 4].map(n => ({
+    index: `0${n}`,
+    title: get('categories', `cat${n}_title`),
+    tags: get('categories', `cat${n}_tags`)
+  }))
+
   return (
     <section className={`py-20 px-6 md:px-12 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <div className="max-w-7xl mx-auto">
         <FadeUp>
           <div className="mb-10">
-            <p className={`text-xs font-bold tracking-widest uppercase mb-3 transition-colors duration-500 ${dark ? 'text-white/30' : 'text-[#1A1A1A]/40'}`}>Browse by</p>
-            <h2 className={`text-4xl md:text-5xl font-black tracking-tighter leading-none transition-colors duration-500 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`}>Game Categories</h2>
+            <div className={`text-xs font-bold tracking-widest uppercase mb-3 transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/30' : 'text-[#1A1A1A]/40'}`} dangerouslySetInnerHTML={renderHTML(get('categories', 'subhead'))} />
+            <div className={`text-4xl md:text-5xl font-black tracking-tighter leading-none transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('categories', 'headline'))} />
           </div>
         </FadeUp>
         <div className="flex flex-col">
-          {CATEGORIES.map((cat, i) => <CategoryRow key={cat.index} cat={cat} delay={i * 0.07} dark={dark} />)}
+          {categoriesData.map((cat, i) => <CategoryRow key={cat.index} cat={cat} delay={i * 0.07} dark={dark} />)}
         </div>
       </div>
     </section>

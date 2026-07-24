@@ -28,6 +28,17 @@ const SECTIONS: Record<string, any> = {
     title: 'Trending Games', desc: 'Games section headers.',
     fields: [{ key: 'sectionTitle', label: 'Section Title' }]
   },
+  categories: {
+    title: 'Game Categories', desc: 'Browse by category labels and tags.',
+    fields: [
+      { key: 'subhead', label: 'Subhead (e.g. Browse by)' },
+      { key: 'headline', label: 'Main Headline' },
+      { key: 'cat1_title', label: 'Category 1 Title' }, { key: 'cat1_tags', label: 'Category 1 Tags' },
+      { key: 'cat2_title', label: 'Category 2 Title' }, { key: 'cat2_tags', label: 'Category 2 Tags' },
+      { key: 'cat3_title', label: 'Category 3 Title' }, { key: 'cat3_tags', label: 'Category 3 Tags' },
+      { key: 'cat4_title', label: 'Category 4 Title' }, { key: 'cat4_tags', label: 'Category 4 Tags' },
+    ]
+  },
   stats: {
     title: 'Community Stats', desc: 'Community numbers and labels.',
     fields: [
@@ -50,7 +61,6 @@ const SECTIONS: Record<string, any> = {
   }
 };
 
-// Comprehensive Color Palette including Joe Yoke Brand Colors
 const CUSTOM_COLORS = [
   '#C5FF00', '#d4ff33', '#0A0A0A', '#111111', '#1A1A1A', '#F8F9FA', '#ffffff', '#000000',
   '#e60000', '#ff9900', '#ffff00', '#008a00', '#0066cc', '#9933ff',
@@ -60,7 +70,6 @@ const CUSTOM_COLORS = [
   '#444444', '#5c0000', '#663d00', '#666600', '#003700', '#002966', '#3d1466'
 ];
 
-// Fully comprehensive toolbar configuration
 const quillModules = {
   toolbar: [
     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],

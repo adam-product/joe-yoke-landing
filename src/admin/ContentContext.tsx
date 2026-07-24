@@ -22,6 +22,14 @@ const DEFAULT_CONTENT: Record<string, any> = {
   games: {
     sectionTitle: "Trending Games"
   },
+  categories: {
+    subhead: "Browse by",
+    headline: "Game Categories",
+    cat1_title: "Action & Arcade", cat1_tags: "Fast-paced / Combat / 3D",
+    cat2_title: "Puzzle & Brain", cat2_tags: "Logic / Wordplay / Strategy",
+    cat3_title: "Party & Social", cat3_tags: "Multiplayer / Trivia / Bluffing",
+    cat4_title: "Sports & Racing", cat4_tags: "Competitive / Real-time / Leaderboard"
+  },
   stats: {
     headline: "Built for gamers,\nby gamers.",
     ctaLabel: "Join Discord",
