@@ -404,7 +404,7 @@ function Footer({ dark }: { dark: boolean }) {
   const navigate = useNavigate()
 
   return (
-    <footer id="download" className={`pt-16 md:pt-20 pb-0 px-4 sm:px-6 md:px-12 overflow-hidden transition-colors duration-500 ${dark ? 'bg-[#050505]' : 'bg-[#0A0A0A]'}`}>
+    <footer id="download" className={`rounded-t-3xl md:rounded-t-[3rem] pt-16 md:pt-20 pb-0 px-4 sm:px-6 md:px-12 overflow-hidden transition-colors duration-500 ${dark ? 'bg-[#050505]' : 'bg-[#0A0A0A]'}`}>
       <div className="max-w-7xl mx-auto w-full min-w-0">
         <FadeUp className="w-full">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 pb-12 md:pb-16 border-b border-white/10 w-full min-w-0">
