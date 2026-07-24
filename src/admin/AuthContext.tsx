@@ -6,11 +6,13 @@ import { projectId, publicAnonKey } from '../../utils/supabase/info';
 const supabaseUrl = `https://${projectId}.supabase.co`;
 const supabase = createClient(supabaseUrl, publicAnonKey);
 
-const DEFAULT_USERS = [
+// ADDED EXPORT AND RENAMED BACK TO MOCK_USERS
+export const MOCK_USERS = [
   { id: '1', name: 'Alex Rivera', email: 'admin@joeyoke.com', password: 'password', role: 'Super Admin' }
 ];
 
-const ROLE_PERMISSIONS: Record<string, string[]> = {
+// ADDED EXPORT
+export const ROLE_PERMISSIONS: Record<string, string[]> = {
   'Super Admin': ['view_dashboard', 'edit_content', 'manage_users', 'view_analytics'],
   'Editor': ['view_dashboard', 'edit_content', 'view_analytics'],
   'Viewer': ['view_dashboard', 'view_analytics']
@@ -55,8 +57,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUsers(data.value);
       } else {
         // Initialize default admin if no users exist in database
-        setUsers(DEFAULT_USERS);
-        await supabase.from('kv_store_dd2dc34e').upsert({ key: 'site_users', value: DEFAULT_USERS });
+        setUsers(MOCK_USERS);
+        await supabase.from('kv_store_dd2dc34e').upsert({ key: 'site_users', value: MOCK_USERS });
       }
     }
     fetchUsers();
