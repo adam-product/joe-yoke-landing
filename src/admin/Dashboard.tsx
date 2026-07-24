@@ -6,6 +6,17 @@ import { projectId, publicAnonKey } from '../../utils/supabase/info';
 
 const supabase = createClient(`https://${projectId}.supabase.co`, publicAnonKey);
 
+const getCountryCode = (countryName: string): string => {
+  if (!countryName) return 'UN';
+  const codeLookup: Record<string, string> = {
+    'Thailand': 'TH', 'United States': 'US', 'India': 'IN', 'Bangladesh': 'BD',
+    'Pakistan': 'PK', 'United Kingdom': 'GB', 'Sri Lanka': 'LK', 'UAE': 'AE',
+    'Canada': 'CA', 'Australia': 'AU', 'Saudi Arabia': 'SA', 'Germany': 'DE',
+    'France': 'FR', 'Japan': 'JP', 'China': 'CN', 'Singapore': 'SG', 'Malaysia': 'MY'
+  };
+  return codeLookup[countryName] || countryName.slice(0, 2).toUpperCase();
+};
+
 export default function Dashboard() {
   const [logs, setLogs] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
@@ -35,7 +46,6 @@ export default function Dashboard() {
     fetchAnalytics();
   }, []);
 
-  // 100% Real-Time Aggregated Calculations (Zero hardcoded values)
   const metrics = useMemo(() => {
     const totalVisits = logs.length;
     const uniqueVisitors = new Set(logs.map(log => log.visitor_id)).size;
@@ -52,31 +62,26 @@ export default function Dashboard() {
 
     const calcPct = (count: number) => totalVisits > 0 ? Math.round((count / totalVisits) * 100) : 0;
 
-    // 2. Real Country Aggregation
-    const countryMap: Record<string, { code: string; name: string; count: number }> = {};
-    const codeLookup: Record<string, string> = {
-      'United States': 'US', 'India': 'IN', 'Bangladesh': 'BD', 'Pakistan': 'PK',
-      'United Kingdom': 'GB', 'Sri Lanka': 'LK', 'UAE': 'AE', 'Canada': 'CA',
-      'Australia': 'AU', 'Saudi Arabia': 'SA'
-    };
-
+    // 2. Real Country Aggregation (Dynamic)
+    const countryMap: Record<string, number> = {};
     logs.forEach(l => {
-      const countryName = l.country || 'United States';
-      const code = codeLookup[countryName] || countryName.slice(0, 2).toUpperCase();
-      if (!countryMap[countryName]) {
-        countryMap[countryName] = { code, name: countryName, count: 0 };
-      }
-      countryMap[countryName].count += 1;
+      const name = l.country || 'United States';
+      countryMap[name] = (countryMap[name] || 0) + 1;
     });
 
-    const countries = Object.values(countryMap)
+    const countries = Object.entries(countryMap)
+      .map(([name, count]) => ({
+        name,
+        code: getCountryCode(name),
+        count
+      }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
     const maxCountryCount = countries[0]?.count || 1;
 
-    // 3. Real Traffic Sources
-    const sourceCounts: Record<string, number> = {
+    // 3. Real Traffic Sources Aggregation
+    const sourceMap: Record<string, number> = {
       'Organic Search': 0,
       'Direct': 0,
       'Social Media': 0,
@@ -86,20 +91,21 @@ export default function Dashboard() {
 
     logs.forEach(l => {
       const src = l.traffic_source || 'Direct';
-      sourceCounts[src] = (sourceCounts[src] || 0) + 1;
+      sourceMap[src] = (sourceMap[src] || 0) + 1;
     });
 
-    const maxSourceCount = Math.max(...Object.values(sourceCounts), 1);
+    const maxSourceCount = Math.max(...Object.values(sourceMap), 1);
 
-    // 4. Real Operating Systems Percentages
-    const osCounts: Record<string, number> = {
-      Android: logs.filter(l => l.os === 'Android').length,
-      iOS: logs.filter(l => l.os === 'iOS').length,
-      Windows: logs.filter(l => l.os === 'Windows').length,
-      macOS: logs.filter(l => l.os === 'macOS').length,
-    };
+    // 4. Real Operating Systems Aggregation (Dynamic)
+    const osMap: Record<string, number> = {};
+    logs.forEach(l => {
+      const osName = l.os || 'Other';
+      osMap[osName] = (osMap[osName] || 0) + 1;
+    });
 
-    const mobileOSPct = calcPct(osCounts.Android + osCounts.iOS);
+    const androidCount = osMap['Android'] || 0;
+    const iosCount = osMap['iOS'] || 0;
+    const mobileOSPct = totalVisits > 0 ? Math.round(((androidCount + iosCount) / totalVisits) * 100) : 0;
 
     // 5. Real Event Counts
     const eventCounts = {
@@ -140,9 +146,9 @@ export default function Dashboard() {
       trendData,
       countries,
       maxCountryCount,
-      sourceCounts,
+      sourceMap,
       maxSourceCount,
-      osCounts,
+      osMap,
       mobileOSPct,
       eventCounts,
       deviceData: [
@@ -284,7 +290,7 @@ export default function Dashboard() {
           <div>
             <h3 className="text-white font-bold mb-6">Traffic Sources</h3>
             <div className="flex flex-col gap-5">
-              {Object.entries(metrics.sourceCounts).map(([source, count], idx) => {
+              {Object.entries(metrics.sourceMap).map(([source, count], idx) => {
                 const colors = ['#C5FF00', '#60a5fa', '#f472b6', '#a78bfa', '#fb923c'];
                 const pct = metrics.totalVisits > 0 ? Math.round((count / metrics.totalVisits) * 100) : 0;
                 return (
@@ -308,21 +314,25 @@ export default function Dashboard() {
           <div>
             <h3 className="text-white font-bold mb-6">Top Operating Systems</h3>
             <div className="flex flex-col gap-5">
-              {[
-                { name: 'Android', count: metrics.osCounts.Android, color: '#C5FF00' },
-                { name: 'iOS', count: metrics.osCounts.iOS, color: '#60a5fa' },
-                { name: 'Windows', count: metrics.osCounts.Windows, color: '#a78bfa' },
-                { name: 'macOS', count: metrics.osCounts.macOS, color: '#fb923c' },
-              ].map(os => {
-                const pct = metrics.totalVisits > 0 ? Math.round((os.count / metrics.totalVisits) * 100) : 0;
+              {['Android', 'iOS', 'Windows', 'macOS', 'Linux', 'Other'].map(osName => {
+                const count = metrics.osMap[osName] || 0;
+                const pct = metrics.totalVisits > 0 ? Math.round((count / metrics.totalVisits) * 100) : 0;
+                const colors: Record<string, string> = {
+                  Android: '#C5FF00',
+                  iOS: '#60a5fa',
+                  Windows: '#a78bfa',
+                  macOS: '#fb923c',
+                  Linux: '#f472b6',
+                  Other: '#6b7280'
+                };
                 return (
-                  <div key={os.name} className="flex flex-col gap-2">
+                  <div key={osName} className="flex flex-col gap-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/70 font-medium">{os.name}</span>
-                      <span className="text-white font-bold">{pct}% ({os.count})</span>
+                      <span className="text-white/70 font-medium">{osName}</span>
+                      <span className="text-white font-bold">{pct}% ({count})</span>
                     </div>
                     <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: os.color }} />
+                      <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: colors[osName] || '#C5FF00' }} />
                     </div>
                   </div>
                 );

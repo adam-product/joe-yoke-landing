@@ -315,10 +315,7 @@ function CategoryRow({ cat, delay, dark }: { cat: Category; delay: number; dark:
           </span>
           
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-16 flex-1 min-w-0">
-            {/* Category Title with fixed width allocation */}
             <div className={`text-lg sm:text-xl md:text-2xl font-black tracking-tight shrink-0 transition-colors duration-150 md:w-64 [&_p]:m-0 ${hovered ? 'text-[#1A1A1A]' : dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(cat.title)} />
-            
-            {/* Category Tags in single line with room to breathe */}
             <div className={`text-xs md:text-sm transition-colors duration-150 whitespace-nowrap overflow-hidden text-ellipsis flex-1 [&_p]:m-0 ${hovered ? 'text-[#1A1A1A]/70 font-medium' : dark ? 'text-white/40' : 'text-[#1A1A1A]/50'}`} dangerouslySetInnerHTML={renderHTML(cat.tags)} />
           </div>
         </div>
@@ -484,6 +481,7 @@ function LiquidGlassBar({ dark }: { dark: boolean }) {
 export default function App() {
   const [darkMode, setDarkMode] = useState(false)
 
+  // Robust visit tracker with IP API + Timezone fallback + User Agent OS parser
   useEffect(() => {
     const trackVisit = async () => {
       let visitorId = localStorage.getItem('joeyoke_visitor_id');
@@ -492,15 +490,29 @@ export default function App() {
         localStorage.setItem('joeyoke_visitor_id', visitorId);
       }
       
-      const ua = navigator.userAgent;
+      const ua = navigator.userAgent || '';
       let deviceType = 'Desktop';
       let os = 'Windows';
 
-      if (/android/i.test(ua)) { deviceType = 'Mobile'; os = 'Android'; }
-      else if (/iphone|ipad|ipod/i.test(ua)) { deviceType = /ipad/i.test(ua) ? 'Tablet' : 'Mobile'; os = 'iOS'; }
-      else if (/mac/i.test(ua)) { os = 'macOS'; }
-      else if (/linux/i.test(ua)) { os = 'Linux'; }
+      // Enhanced OS & Device Detection
+      if (/android/i.test(ua)) {
+        deviceType = 'Mobile';
+        os = 'Android';
+      } else if (/iphone|ipad|ipod/i.test(ua)) {
+        deviceType = /ipad/i.test(ua) ? 'Tablet' : 'Mobile';
+        os = 'iOS';
+      } else if (/macintosh|mac os x/i.test(ua)) {
+        os = 'macOS';
+        deviceType = 'Desktop';
+      } else if (/windows|win32/i.test(ua)) {
+        os = 'Windows';
+        deviceType = 'Desktop';
+      } else if (/linux/i.test(ua)) {
+        os = 'Linux';
+        deviceType = 'Desktop';
+      }
 
+      // Traffic source detection
       let trafficSource = 'Direct';
       const ref = document.referrer;
       if (ref) {
@@ -509,13 +521,24 @@ export default function App() {
         else trafficSource = 'Referral';
       }
 
-      const userLang = navigator.language || 'en-US';
-      const countryMap: Record<string, string> = {
-        'en-IN': 'India', 'hi': 'India', 'bn-BD': 'Bangladesh', 'ur-PK': 'Pakistan',
-        'en-GB': 'United Kingdom', 'en-US': 'United States', 'en-AU': 'Australia',
-        'ar-AE': 'UAE', 'ar-SA': 'Saudi Arabia', 'en-CA': 'Canada', 'en-LK': 'Sri Lanka'
-      };
-      const country = countryMap[userLang] || 'United States';
+      // Country detection via IP geolocation with Timezone fallback
+      let country = 'Thailand';
+      try {
+        const res = await fetch('https://api.country.is', { signal: AbortSignal.timeout(2000) });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.country) {
+            const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+            country = regionNames.of(data.country.toUpperCase()) || data.country;
+          }
+        }
+      } catch {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        if (tz.includes('Bangkok') || tz.includes('Thailand') || tz.includes('Asia/Jakarta')) country = 'Thailand';
+        else if (tz.includes('Calcutta') || tz.includes('Kolkata') || tz.includes('India')) country = 'India';
+        else if (tz.includes('London')) country = 'United Kingdom';
+        else if (tz.includes('America')) country = 'United States';
+      }
 
       await supabase.from('page_views').insert([{
         path: window.location.pathname,
@@ -527,10 +550,7 @@ export default function App() {
       }]);
     };
     
-    if (!sessionStorage.getItem('joeyoke_tracked')) {
-      trackVisit();
-      sessionStorage.setItem('joeyoke_tracked', 'true');
-    }
+    trackVisit();
   }, []);
 
   return (
