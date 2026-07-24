@@ -225,18 +225,33 @@ function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boo
         <div className="group relative rounded-3xl overflow-hidden" style={{ minHeight: 320 }}>
           <img src={game.image} alt={game.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
           <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, ${accent} 0%, transparent 70%)` }} />
+          
           <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-10">
             <span className="px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase backdrop-blur-sm" style={{ background: `${accent}25`, color: accent, border: `1px solid ${accent}40` }}>{game.badge}</span>
             <button className="w-9 h-9 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-all group/btn">
               <ArrowUpRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
             </button>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-2 px-5 pb-5 pt-10" style={{ background: 'linear-gradient(to bottom, transparent, rgba(8,8,10,0.72) 30%, rgba(8,8,10,0.88) 100%)' }}>
-            <h3 className="relative text-white text-xl font-black tracking-tight leading-tight">{game.title}</h3>
-            <p className="relative text-white/55 text-sm leading-relaxed">{game.description}</p>
-            <a href="#" className="relative group/link inline-flex items-center gap-1.5 text-sm font-semibold tracking-wide hover:gap-3 transition-all duration-200 mt-1" style={{ color: accent }}>
+
+          {/* Bottom Overlay with Progressive Blur */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-2 px-5 pb-5 pt-16">
+            
+            {/* The Blur + Gradient Layer (Masked to fade in smoothly) */}
+            <div className="absolute inset-0 z-0 pointer-events-none" style={{
+              background: 'linear-gradient(to bottom, transparent 0%, rgba(8,8,10,0.6) 40%, rgba(8,8,10,0.95) 100%)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 40%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 40%)'
+            }} />
+            
+            {/* The Text Content (z-10 to sit on top of the blur) */}
+            <h3 className="relative z-10 text-white text-xl font-black tracking-tight leading-tight">{game.title}</h3>
+            <p className="relative z-10 text-white/75 text-sm leading-relaxed">{game.description}</p>
+            <a href="#" className="relative z-10 group/link inline-flex items-center gap-1.5 text-sm font-semibold tracking-wide hover:gap-3 transition-all duration-200 mt-1" style={{ color: accent }}>
               VIEW DETAILS <ArrowRight className="w-4 h-4" />
             </a>
+            
           </div>
         </div>
       </div>
