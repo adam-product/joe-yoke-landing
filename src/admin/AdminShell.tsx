@@ -29,9 +29,9 @@ export default function AdminShell() {
     }`;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-[#111] border-r border-white/10 flex flex-col shrink-0">
+    <div className="min-h-screen bg-[#0A0A0A] flex flex-col md:flex-row relative">
+      {/* Sidebar: Fixed height, sticky position, and bottom element locked */}
+      <aside className="w-full md:w-64 bg-[#111] border-r border-white/10 flex flex-col shrink-0 h-screen sticky top-0">
         <div className="p-6 flex items-center gap-3 border-b border-white/10">
           <img src={faviconImg} alt="Joe Yoke" className="w-8 h-8 rounded-lg object-cover" />
           <div className="flex flex-col">
@@ -67,7 +67,6 @@ export default function AdminShell() {
                 <NavLink to="/admin/content/games" className={subNavLinkClass}>
                   <Gamepad2 className="w-4 h-4" /> Trending Games
                 </NavLink>
-                {/* NEW CATEGORIES LINK ADDED HERE */}
                 <NavLink to="/admin/content/categories" className={subNavLinkClass}>
                   <Layers className="w-4 h-4" /> Game Categories
                 </NavLink>
@@ -86,7 +85,8 @@ export default function AdminShell() {
           </NavLink>
         </nav>
 
-        <div className="p-4 border-t border-white/10 flex flex-col gap-2">
+        {/* This block is naturally pushed to the bottom because the nav above it is flex-1 */}
+        <div className="p-4 border-t border-white/10 flex flex-col gap-2 mt-auto">
           <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors mb-2">
             <ExternalLink className="w-5 h-5" /> View Site
           </a>
@@ -108,8 +108,8 @@ export default function AdminShell() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-x-hidden">
+      {/* Main Content Area: Added p-6 md:p-10 to give the dashboard space */}
+      <main className="flex-1 overflow-x-hidden p-6 md:p-10">
         <Outlet />
       </main>
     </div>

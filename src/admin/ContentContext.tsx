@@ -2,11 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
 
-// Initialize Supabase Client
 const supabaseUrl = `https://${projectId}.supabase.co`;
 const supabase = createClient(supabaseUrl, publicAnonKey);
 
-// 1. Bulletproof Fallback Content (Prevents blank screens!)
 const DEFAULT_CONTENT: Record<string, any> = {
   hero: {
     headline: "The games\nbring you in,\nbut the\nfriendships\nkeep you\nhere.",
@@ -25,10 +23,13 @@ const DEFAULT_CONTENT: Record<string, any> = {
   categories: {
     subhead: "Browse by",
     headline: "Game Categories",
-    cat1_title: "Action & Arcade", cat1_tags: "Fast-paced / Combat / 3D",
-    cat2_title: "Puzzle & Brain", cat2_tags: "Logic / Wordplay / Strategy",
-    cat3_title: "Party & Social", cat3_tags: "Multiplayer / Trivia / Bluffing",
-    cat4_title: "Sports & Racing", cat4_tags: "Competitive / Real-time / Leaderboard"
+    // Changed to an array for dynamic adding/removing
+    categoryList: [
+      { title: "Action & Arcade", tags: "Fast-paced / Combat / 3D" },
+      { title: "Puzzle & Brain", tags: "Logic / Wordplay / Strategy" },
+      { title: "Party & Social", tags: "Multiplayer / Trivia / Bluffing" },
+      { title: "Sports & Racing", tags: "Competitive / Real-time / Leaderboard" }
+    ]
   },
   stats: {
     headline: "Built for gamers,\nby gamers.",
@@ -48,7 +49,7 @@ const DEFAULT_CONTENT: Record<string, any> = {
 
 interface ContentContextType {
   content: Record<string, any>;
-  get: (section: string, field: string) => string;
+  get: (section: string, field: string) => any; // Changed to 'any' to safely return arrays
   updateContent: (sectionOrFull: any, possibleData?: any) => Promise<void>;
   loading: boolean;
 }
@@ -56,11 +57,9 @@ interface ContentContextType {
 const ContentContext = createContext<ContentContextType | null>(null);
 
 export function ContentProvider({ children }: { children: React.ReactNode }) {
-  // Initialize state with defaults immediately
   const [content, setContent] = useState<Record<string, any>>(DEFAULT_CONTENT);
   const [loading, setLoading] = useState(true);
 
-  // 2. Fetch live content and merge it over defaults
   useEffect(() => {
     async function fetchContent() {
       try {
@@ -70,12 +69,9 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
           .eq('key', 'site_content')
           .maybeSingle();
 
-        if (error) {
-          console.error('Supabase fetch error:', error.message);
-        }
+        if (error) console.error('Supabase fetch error:', error.message);
 
         if (data?.value) {
-          // Merge database data on top of defaults
           setContent((prev) => ({ ...prev, ...data.value }));
         }
       } catch (err) {
@@ -105,12 +101,10 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // 3. Smart Get: Safely returns DB value, or Default value, or empty string
-  const get = (section: string, field: string): string => {
+  const get = (section: string, field: string): any => {
     return content?.[section]?.[field] ?? DEFAULT_CONTENT[section]?.[field] ?? '';
   };
 
-  // 4. Smart Save: Handles both full object saves and section-specific saves
   const updateContent = async (sectionOrFull: any, possibleData?: any) => {
     let newContent;
     if (typeof sectionOrFull === 'string' && possibleData) {
@@ -118,15 +112,8 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     } else {
       newContent = { ...content, ...sectionOrFull };
     }
-
-    // Instantly update UI
     setContent(newContent);
-
-    // Save to Supabase
-    const { error } = await supabase
-      .from('kv_store_dd2dc34e')
-      .upsert({ key: 'site_content', value: newContent });
-
+    const { error } = await supabase.from('kv_store_dd2dc34e').upsert({ key: 'site_content', value: newContent });
     if (error) {
       console.error('Database Save Failed:', error.message);
       alert('Error saving to database. Check console.');

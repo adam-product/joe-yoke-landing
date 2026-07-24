@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useContent } from './ContentContext';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { Save, CheckCircle } from 'lucide-react';
+import { Save, CheckCircle, Plus, Trash2 } from 'lucide-react';
 
 const SECTIONS: Record<string, any> = {
   hero: {
@@ -33,10 +33,6 @@ const SECTIONS: Record<string, any> = {
     fields: [
       { key: 'subhead', label: 'Subhead (e.g. Browse by)' },
       { key: 'headline', label: 'Main Headline' },
-      { key: 'cat1_title', label: 'Category 1 Title' }, { key: 'cat1_tags', label: 'Category 1 Tags' },
-      { key: 'cat2_title', label: 'Category 2 Title' }, { key: 'cat2_tags', label: 'Category 2 Tags' },
-      { key: 'cat3_title', label: 'Category 3 Title' }, { key: 'cat3_tags', label: 'Category 3 Tags' },
-      { key: 'cat4_title', label: 'Category 4 Title' }, { key: 'cat4_tags', label: 'Category 4 Tags' },
     ]
   },
   stats: {
@@ -89,7 +85,7 @@ export default function ContentManager() {
   const { content, updateContent } = useContent();
   const currentSection = SECTIONS[sectionId || 'hero'];
   
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<Record<string, any>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -128,7 +124,7 @@ export default function ContentManager() {
   if (!currentSection) return <div className="p-8 text-white">Section not found</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 md:p-10 relative">
+    <div className="max-w-4xl mx-auto relative pb-24">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">{currentSection.title}</h1>
         <p className="text-gray-400">{currentSection.desc}</p>
@@ -168,6 +164,77 @@ export default function ContentManager() {
             )}
           </div>
         ))}
+
+        {/* Dynamic Category Builder (Only shows on the categories tab) */}
+        {sectionId === 'categories' && (
+          <div className="flex flex-col gap-6 mt-4 pt-8 border-t border-white/10">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-white">Dynamic Categories</h2>
+                <p className="text-sm text-white/40 mt-1">Add or remove rows dynamically.</p>
+              </div>
+              <button 
+                onClick={() => {
+                  const newList = [...(formData.categoryList || []), { title: 'New Category', tags: 'Example / Tags / Here' }];
+                  setFormData(prev => ({ ...prev, categoryList: newList }));
+                }}
+                className="flex items-center gap-2 bg-white/10 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-white/20 transition-colors"
+              >
+                <Plus className="w-4 h-4" /> Add Game Category
+              </button>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              {(formData.categoryList || []).map((cat: any, idx: number) => (
+                <div key={idx} className="flex flex-col gap-4 p-5 border border-white/10 rounded-xl relative bg-black/20">
+                  <button 
+                    onClick={() => {
+                      const newList = [...formData.categoryList];
+                      newList.splice(idx, 1);
+                      setFormData(prev => ({ ...prev, categoryList: newList }));
+                    }}
+                    className="absolute top-4 right-4 text-white/30 hover:text-red-500 transition-colors"
+                    title="Delete Category"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                  
+                  <div className="flex flex-col gap-2 pr-8">
+                    <label className="text-xs font-bold tracking-widest text-gray-400 uppercase">Category Title (HTML Supported)</label>
+                    <input 
+                      type="text" 
+                      value={cat.title} 
+                      onChange={(e) => {
+                        const newList = [...formData.categoryList];
+                        newList[idx].title = e.target.value;
+                        setFormData(prev => ({ ...prev, categoryList: newList }));
+                      }}
+                      className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C5FF00] transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-bold tracking-widest text-gray-400 uppercase">Category Tags (HTML Supported)</label>
+                    <input 
+                      type="text" 
+                      value={cat.tags} 
+                      onChange={(e) => {
+                        const newList = [...formData.categoryList];
+                        newList[idx].tags = e.target.value;
+                        setFormData(prev => ({ ...prev, categoryList: newList }));
+                      }}
+                      className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C5FF00] transition-colors"
+                    />
+                  </div>
+                </div>
+              ))}
+              {(!formData.categoryList || formData.categoryList.length === 0) && (
+                <div className="text-center py-8 border border-dashed border-white/10 rounded-xl text-white/40 text-sm">
+                  No categories added yet. Click the button above to start.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="pt-6 border-t border-white/10 flex justify-end">
           <button 

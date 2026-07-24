@@ -290,12 +290,18 @@ function CategoryRow({ cat, delay, dark }: { cat: Category; delay: number; dark:
 }
 
 function Categories({ dark }: { dark: boolean }) {
-  const { get } = useContent()
+  const { get, content } = useContent()
   
-  const categoriesData: Category[] = [1, 2, 3, 4].map(n => ({
-    index: `0${n}`,
-    title: get('categories', `cat${n}_title`),
-    tags: get('categories', `cat${n}_tags`)
+  // Safely retrieve the category array from the database
+  const rawList = Array.isArray(content?.categories?.categoryList) 
+    ? content.categories.categoryList 
+    : (Array.isArray(get('categories', 'categoryList')) ? get('categories', 'categoryList') : []);
+    
+  // Map it to include the formatted index numbers (01, 02, etc.)
+  const categoriesData: Category[] = rawList.map((cat: any, i: number) => ({
+    index: `0${i + 1}`.slice(-2),
+    title: cat.title,
+    tags: cat.tags
   }))
 
   return (
