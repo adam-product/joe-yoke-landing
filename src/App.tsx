@@ -304,16 +304,27 @@ function CategoryRow({ cat, delay, dark }: { cat: Category; delay: number; dark:
   const [hovered, setHovered] = useState(false)
   return (
     <FadeUp delay={delay}>
-      <div className={`group flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 md:px-8 py-5 md:py-6 cursor-pointer transition-all duration-150 rounded-xl gap-4 sm:gap-0 ${hovered ? 'bg-[#C5FF00]' : ''} ${dark ? 'border-t border-white/10 last:border-b' : 'border-t border-[#E5E7EB] last:border-b'}`} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-        <div className="flex items-start sm:items-center gap-4 sm:gap-6 md:gap-10 min-w-0 flex-1">
-          <span className={`text-xs md:text-sm font-mono font-bold shrink-0 transition-colors duration-150 pt-1 sm:pt-0 ${hovered ? 'text-[#1A1A1A]/50' : dark ? 'text-white/30' : 'text-[#1A1A1A]/30'}`}>{cat.index}</span>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 md:gap-10 min-w-0">
-            <div className={`text-lg sm:text-xl md:text-2xl font-black tracking-tight transition-colors duration-150 break-words w-full [&_p]:m-0 ${hovered ? 'text-[#1A1A1A]' : dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(cat.title)} />
-            <div className={`text-xs md:text-sm transition-colors duration-150 break-words w-full [&_p]:m-0 ${hovered ? 'text-[#1A1A1A]/60' : dark ? 'text-white/30' : 'text-[#1A1A1A]/40'}`} dangerouslySetInnerHTML={renderHTML(cat.tags)} />
+      <div 
+        className={`group flex items-center justify-between px-6 md:px-10 py-6 cursor-pointer transition-all duration-150 rounded-2xl gap-6 md:gap-12 ${hovered ? 'bg-[#C5FF00]' : ''} ${dark ? 'border-t border-white/10 last:border-b' : 'border-t border-[#E5E7EB] last:border-b'}`} 
+        onMouseEnter={() => setHovered(true)} 
+        onMouseLeave={() => setHovered(false)}
+      >
+        <div className="flex items-center gap-6 md:gap-12 flex-1 min-w-0">
+          <span className={`text-xs md:text-sm font-mono font-bold shrink-0 transition-colors duration-150 ${hovered ? 'text-[#1A1A1A]/50' : dark ? 'text-white/30' : 'text-[#1A1A1A]/30'}`}>
+            {cat.index}
+          </span>
+          
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-16 flex-1 min-w-0">
+            {/* Category Title with fixed width allocation */}
+            <div className={`text-lg sm:text-xl md:text-2xl font-black tracking-tight shrink-0 transition-colors duration-150 md:w-64 [&_p]:m-0 ${hovered ? 'text-[#1A1A1A]' : dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(cat.title)} />
+            
+            {/* Category Tags in single line with room to breathe */}
+            <div className={`text-xs md:text-sm transition-colors duration-150 whitespace-nowrap overflow-hidden text-ellipsis flex-1 [&_p]:m-0 ${hovered ? 'text-[#1A1A1A]/70 font-medium' : dark ? 'text-white/40' : 'text-[#1A1A1A]/50'}`} dangerouslySetInnerHTML={renderHTML(cat.tags)} />
           </div>
         </div>
-        <div className={`shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border transition-all duration-200 self-end sm:self-auto ${hovered ? 'bg-[#1A1A1A] border-[#1A1A1A] scale-110' : dark ? 'border-white/20 bg-transparent' : 'border-[#1A1A1A]/20 bg-transparent'}`}>
-          <ArrowUpRight className={`w-3 h-3 md:w-4 md:h-4 transition-colors duration-150 ${hovered ? 'text-[#C5FF00]' : dark ? 'text-white/40' : 'text-[#1A1A1A]/40'}`} />
+
+        <div className={`shrink-0 w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center border transition-all duration-200 ${hovered ? 'bg-[#1A1A1A] border-[#1A1A1A] scale-110' : dark ? 'border-white/20 bg-transparent' : 'border-[#1A1A1A]/20 bg-transparent'}`}>
+          <ArrowUpRight className={`w-4 h-4 transition-colors duration-150 ${hovered ? 'text-[#C5FF00]' : dark ? 'text-white/40' : 'text-[#1A1A1A]/40'}`} />
         </div>
       </div>
     </FadeUp>
@@ -473,7 +484,6 @@ function LiquidGlassBar({ dark }: { dark: boolean }) {
 export default function App() {
   const [darkMode, setDarkMode] = useState(false)
 
-  // Track visits along with OS, Traffic Source, and Language/Country info
   useEffect(() => {
     const trackVisit = async () => {
       let visitorId = localStorage.getItem('joeyoke_visitor_id');
@@ -491,7 +501,6 @@ export default function App() {
       else if (/mac/i.test(ua)) { os = 'macOS'; }
       else if (/linux/i.test(ua)) { os = 'Linux'; }
 
-      // Referral detection
       let trafficSource = 'Direct';
       const ref = document.referrer;
       if (ref) {
@@ -500,7 +509,6 @@ export default function App() {
         else trafficSource = 'Referral';
       }
 
-      // Locale-based Country mapping
       const userLang = navigator.language || 'en-US';
       const countryMap: Record<string, string> = {
         'en-IN': 'India', 'hi': 'India', 'bn-BD': 'Bangladesh', 'ur-PK': 'Pakistan',
