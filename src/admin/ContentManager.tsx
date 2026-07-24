@@ -50,6 +50,31 @@ const SECTIONS: Record<string, any> = {
   }
 };
 
+// Comprehensive Color Palette including Joe Yoke Brand Colors
+const CUSTOM_COLORS = [
+  '#C5FF00', '#d4ff33', '#0A0A0A', '#111111', '#1A1A1A', '#F8F9FA', '#ffffff', '#000000',
+  '#e60000', '#ff9900', '#ffff00', '#008a00', '#0066cc', '#9933ff',
+  '#facccc', '#ffebcc', '#ffffcc', '#cce8cc', '#cce0f5', '#ebd6ff',
+  '#bbbbbb', '#f06666', '#ffc266', '#ffff66', '#66b966', '#66a3e0', '#c285ff',
+  '#888888', '#a10000', '#b26b00', '#b2b200', '#006100', '#0047b2', '#6b24b2',
+  '#444444', '#5c0000', '#663d00', '#666600', '#003700', '#002966', '#3d1466'
+];
+
+// Fully comprehensive toolbar configuration
+const quillModules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    [{ 'size': ['small', false, 'large', 'huge'] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
+    [{ 'color': CUSTOM_COLORS }, { 'background': CUSTOM_COLORS }],
+    [{ 'align': [] }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'indent': '-1'}, { 'indent': '+1' }],
+    ['link', 'image', 'video'],
+    ['clean']
+  ],
+};
+
 export default function ContentManager() {
   const { sectionId } = useParams();
   const { content, updateContent } = useContent();
@@ -57,7 +82,7 @@ export default function ContentManager() {
   
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false); // State for the success modal
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     if (content && sectionId && content[sectionId]) {
@@ -69,10 +94,9 @@ export default function ContentManager() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    setShowSuccess(false); // Reset success state on new save
+    setShowSuccess(false);
     try {
       await updateContent(sectionId, formData);
-      // Trigger the success toast and hide it after 3 seconds
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
@@ -93,14 +117,6 @@ export default function ContentManager() {
   };
 
   if (!currentSection) return <div className="p-8 text-white">Section not found</div>;
-
-  const quillModules = {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      ['clean']
-    ],
-  };
 
   return (
     <div className="max-w-4xl mx-auto p-6 md:p-10 relative">
@@ -131,7 +147,7 @@ export default function ContentManager() {
                 />
               </div>
             ) : (
-              <div className="bg-white text-black rounded-lg [&_.ql-editor]:min-h-[100px] [&_.ql-toolbar]:rounded-t-lg [&_.ql-container]:rounded-b-lg">
+              <div className="bg-white text-black rounded-lg [&_.ql-editor]:min-h-[150px] [&_.ql-toolbar]:rounded-t-lg [&_.ql-container]:rounded-b-lg">
                 <ReactQuill 
                   theme="snow"
                   modules={quillModules}
@@ -156,7 +172,6 @@ export default function ContentManager() {
         </div>
       </div>
 
-      {/* Floating Success Toast Notification */}
       {showSuccess && (
         <div className="fixed bottom-10 right-10 bg-[#C5FF00] text-black px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 transition-all duration-300">
           <CheckCircle className="w-6 h-6" />
