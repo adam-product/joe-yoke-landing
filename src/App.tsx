@@ -554,7 +554,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="font-sans antialiased overflow-x-hidden w-full relative">
+    <div className={`font-sans antialiased overflow-x-hidden w-full relative min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <Header darkMode={darkMode} setDarkMode={setDarkMode} />
       <LiquidGlassBar dark={darkMode} />
       <main>
