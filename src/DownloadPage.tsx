@@ -1,20 +1,38 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Smartphone, Download as DownloadIcon, Play } from 'lucide-react';
+import { ArrowLeft, Download as DownloadIcon } from 'lucide-react';
 import { useContent } from './admin/ContentContext';
 import { trackEvent } from './App';
 import faviconImg from '@/imports/favicon.ico-1.jpg';
+// Updated to .png below!
+import appleStoreIcon from '@/imports/Apple App Store icon.png';
+import googlePlayIcon from '@/imports/Google Play Store icon.png';
+
+// Helper to strip HTML tags and sanitize URLs
+const cleanText = (str: string) => {
+  if (!str) return '';
+  return str.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+};
+
+const cleanUrl = (rawUrl: string) => {
+  let url = cleanText(rawUrl);
+  if (!url) return '';
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
+  }
+  return url;
+};
 
 export default function DownloadPage() {
   const navigate = useNavigate();
   const { get } = useContent();
 
-  const title = get('downloads', 'pageTitle') || 'Get Joe Yoke';
-  const subtitle = get('downloads', 'pageSubtitle') || 'Choose your platform to start playing.';
-  const playStoreUrl = get('downloads', 'playStoreLink');
-  const appStoreUrl = get('downloads', 'appStoreLink');
-  const directUrl = get('downloads', 'directLink');
+  const title = cleanText(get('downloads', 'pageTitle')) || 'Get Joe Yoke';
+  const subtitle = cleanText(get('downloads', 'pageSubtitle')) || 'Choose your platform to start playing.';
+  const playStoreUrl = cleanUrl(get('downloads', 'playStoreLink'));
+  const appStoreUrl = cleanUrl(get('downloads', 'appStoreLink'));
+  const directUrl = cleanUrl(get('downloads', 'directLink'));
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -22,14 +40,20 @@ export default function DownloadPage() {
 
   const handleDownload = (platform: string, url: string) => {
     trackEvent(`${platform}_download_click`);
-    if (url) window.location.href = url;
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      alert('Download link has not been configured yet.');
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex flex-col relative overflow-hidden font-sans antialiased text-white">
       
+      {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#C5FF00]/10 blur-[120px] rounded-full pointer-events-none" />
 
+      {/* Header */}
       <header className="relative z-10 flex items-center justify-between p-6 md:p-10">
         <button 
           onClick={() => navigate(-1)} 
@@ -44,6 +68,7 @@ export default function DownloadPage() {
         <div className="w-16" /> 
       </header>
 
+      {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -58,12 +83,13 @@ export default function DownloadPage() {
 
           <div className="w-full flex flex-col gap-4">
             
+            {/* Apple App Store Button with Custom Icon */}
             <button 
               onClick={() => handleDownload('apple', appStoreUrl)}
               className="w-full group relative flex items-center p-4 bg-[#111] border border-white/10 rounded-2xl hover:border-[#C5FF00]/50 hover:bg-[#C5FF00]/5 transition-all duration-300 overflow-hidden"
             >
-              <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <Smartphone className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 group-hover:scale-105 transition-transform bg-black flex items-center justify-center">
+                <img src={appleStoreIcon} alt="Apple App Store" className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col items-start ml-4">
                 <span className="text-[10px] font-bold text-white/40 tracking-widest uppercase">Download on the</span>
@@ -71,12 +97,13 @@ export default function DownloadPage() {
               </div>
             </button>
 
+            {/* Google Play Store Button with Custom Icon */}
             <button 
               onClick={() => handleDownload('google', playStoreUrl)}
               className="w-full group relative flex items-center p-4 bg-[#111] border border-white/10 rounded-2xl hover:border-[#C5FF00]/50 hover:bg-[#C5FF00]/5 transition-all duration-300 overflow-hidden"
             >
-              <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <Play className="w-6 h-6 text-white" fill="currentColor" />
+              <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 group-hover:scale-105 transition-transform bg-black flex items-center justify-center">
+                <img src={googlePlayIcon} alt="Google Play Store" className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col items-start ml-4">
                 <span className="text-[10px] font-bold text-white/40 tracking-widest uppercase">Get it on</span>
@@ -84,7 +111,8 @@ export default function DownloadPage() {
               </div>
             </button>
 
-            {directUrl && directUrl.trim() !== '' && (
+            {/* Direct APK Download Option */}
+            {directUrl && (
               <>
                 <div className="flex items-center gap-4 my-2 opacity-30">
                   <div className="flex-1 h-[1px] bg-white" />

@@ -11,7 +11,7 @@ const SECTIONS: Record<string, any> = {
     fields: [
       { key: 'headline', label: 'Headline' },
       { key: 'subtext', label: 'Subtext' },
-      { key: 'ctaLabel', label: 'CTA Button Text' },
+      { key: 'ctaLabel', label: 'CTA Button Text', type: 'text' },
       { key: 'heroImage', label: 'Hero Image (Mockup)', type: 'image' },
     ]
   },
@@ -19,9 +19,9 @@ const SECTIONS: Record<string, any> = {
     title: 'About', desc: 'Mission statement and pills.',
     fields: [
       { key: 'quote', label: 'Quote' },
-      { key: 'pill1', label: 'Pill 1' },
-      { key: 'pill2', label: 'Pill 2' },
-      { key: 'pill3', label: 'Pill 3' },
+      { key: 'pill1', label: 'Pill 1', type: 'text' },
+      { key: 'pill2', label: 'Pill 2', type: 'text' },
+      { key: 'pill3', label: 'Pill 3', type: 'text' },
     ]
   },
   games: {
@@ -31,63 +31,60 @@ const SECTIONS: Record<string, any> = {
   categories: {
     title: 'Game Categories', desc: 'Browse by category labels and tags.',
     fields: [
-      { key: 'subhead', label: 'Subhead (e.g. Browse by)' },
-      { key: 'headline', label: 'Main Headline' },
+      { key: 'subhead', label: 'Subhead (e.g. Browse by)', type: 'text' },
+      { key: 'headline', label: 'Main Headline', type: 'text' },
     ]
   },
   stats: {
     title: 'Community Stats', desc: 'Community numbers and labels.',
     fields: [
       { key: 'headline', label: 'Headline' },
-      { key: 'ctaLabel', label: 'CTA Label' },
-      { key: 'stat1_value', label: 'Stat 1 Value' }, { key: 'stat1_label', label: 'Stat 1 Label' },
-      { key: 'stat2_value', label: 'Stat 2 Value' }, { key: 'stat2_label', label: 'Stat 2 Label' },
-      { key: 'stat3_value', label: 'Stat 3 Value' }, { key: 'stat3_label', label: 'Stat 3 Label' },
-      { key: 'stat4_value', label: 'Stat 4 Value' }, { key: 'stat4_label', label: 'Stat 4 Label' },
+      { key: 'ctaLabel', label: 'CTA Label', type: 'text' },
+      { key: 'stat1_value', label: 'Stat 1 Value', type: 'text' }, { key: 'stat1_label', label: 'Stat 1 Label', type: 'text' },
+      { key: 'stat2_value', label: 'Stat 2 Value', type: 'text' }, { key: 'stat2_label', label: 'Stat 2 Label', type: 'text' },
+      { key: 'stat3_value', label: 'Stat 3 Value', type: 'text' }, { key: 'stat3_label', label: 'Stat 3 Label', type: 'text' },
+      { key: 'stat4_value', label: 'Stat 4 Value', type: 'text' }, { key: 'stat4_label', label: 'Stat 4 Label', type: 'text' },
     ]
   },
   footer: {
     title: 'Footer', desc: 'Footer CTA, links, and copyright text.',
     fields: [
-      { key: 'ctaHeadline', label: 'CTA Headline' },
-      { key: 'ctaTagline', label: 'CTA Tagline' },
-      { key: 'ctaBtn', label: 'CTA Button Text' },
-      { key: 'copyright', label: 'Copyright Text' },
+      { key: 'ctaHeadline', label: 'CTA Headline', type: 'text' },
+      { key: 'ctaTagline', label: 'CTA Tagline', type: 'text' },
+      { key: 'ctaBtn', label: 'CTA Button Text', type: 'text' },
+      { key: 'copyright', label: 'Copyright Text', type: 'text' },
     ]
   },
   downloads: {
     title: 'Download Links', desc: 'Configure app store URLs and direct downloads.',
     fields: [
-      { key: 'pageTitle', label: 'Page Title' },
-      { key: 'pageSubtitle', label: 'Page Subtitle' },
-      { key: 'playStoreLink', label: 'Google Play Store URL' },
-      { key: 'appStoreLink', label: 'Apple App Store URL' },
-      { key: 'directLink', label: 'Direct APK/App Download URL (Optional)' },
+      { key: 'pageTitle', label: 'Page Title', type: 'text' },
+      { key: 'pageSubtitle', label: 'Page Subtitle', type: 'text' },
+      { key: 'playStoreLink', label: 'Google Play Store URL', type: 'text' },
+      { key: 'appStoreLink', label: 'Apple App Store URL', type: 'text' },
+      { key: 'directLink', label: 'Direct APK/App Download URL (Optional)', type: 'text' },
     ]
   }
 };
 
 const CUSTOM_COLORS = [
   '#C5FF00', '#d4ff33', '#0A0A0A', '#111111', '#1A1A1A', '#F8F9FA', '#ffffff', '#000000',
-  '#e60000', '#ff9900', '#ffff00', '#008a00', '#0066cc', '#9933ff',
-  '#facccc', '#ffebcc', '#ffffcc', '#cce8cc', '#cce0f5', '#ebd6ff',
-  '#bbbbbb', '#f06666', '#ffc266', '#ffff66', '#66b966', '#66a3e0', '#c285ff',
-  '#888888', '#a10000', '#b26b00', '#b2b200', '#006100', '#0047b2', '#6b24b2',
-  '#444444', '#5c0000', '#663d00', '#666600', '#003700', '#002966', '#3d1466'
+  '#e60000', '#ff9900', '#ffff00', '#008a00', '#0066cc', '#9933ff'
 ];
 
 const quillModules = {
   toolbar: [
-    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-    [{ 'size': ['small', false, 'large', 'huge'] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
     [{ 'color': CUSTOM_COLORS }, { 'background': CUSTOM_COLORS }],
-    [{ 'align': [] }],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'indent': '-1'}, { 'indent': '+1' }],
-    ['link', 'image', 'video'],
     ['clean']
   ],
+};
+
+// Helper to strip HTML tags from plain text inputs
+const stripHtml = (html: string) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
 };
 
 export default function ContentManager() {
@@ -111,7 +108,15 @@ export default function ContentManager() {
     setIsSaving(true);
     setShowSuccess(false);
     try {
-      await updateContent(sectionId, formData);
+      // Clean plain text fields before saving
+      const cleanedData = { ...formData };
+      currentSection.fields.forEach((field: any) => {
+        if (field.type === 'text' && cleanedData[field.key]) {
+          cleanedData[field.key] = stripHtml(cleanedData[field.key]);
+        }
+      });
+
+      await updateContent(sectionId, cleanedData);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
@@ -161,8 +166,15 @@ export default function ContentManager() {
                   className="text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#C5FF00] file:text-black hover:file:bg-[#d4ff33] cursor-pointer transition-colors"
                 />
               </div>
+            ) : field.type === 'text' ? (
+              <input 
+                type="text"
+                value={stripHtml(formData[field.key] || '')}
+                onChange={(e) => setFormData(prev => ({ ...prev, [field.key]: e.target.value }))}
+                className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C5FF00] transition-colors"
+              />
             ) : (
-              <div className="bg-white text-black rounded-lg [&_.ql-editor]:min-h-[150px] [&_.ql-toolbar]:rounded-t-lg [&_.ql-container]:rounded-b-lg">
+              <div className="bg-white text-black rounded-lg [&_.ql-editor]:min-h-[120px] [&_.ql-toolbar]:rounded-t-lg [&_.ql-container]:rounded-b-lg">
                 <ReactQuill 
                   theme="snow"
                   modules={quillModules}
@@ -209,7 +221,7 @@ export default function ContentManager() {
                   </button>
                   
                   <div className="flex flex-col gap-2 pr-8">
-                    <label className="text-xs font-bold tracking-widest text-gray-400 uppercase">Category Title (HTML Supported)</label>
+                    <label className="text-xs font-bold tracking-widest text-gray-400 uppercase">Category Title</label>
                     <input 
                       type="text" 
                       value={cat.title} 
@@ -222,7 +234,7 @@ export default function ContentManager() {
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold tracking-widest text-gray-400 uppercase">Category Tags (HTML Supported)</label>
+                    <label className="text-xs font-bold tracking-widest text-gray-400 uppercase">Category Tags</label>
                     <input 
                       type="text" 
                       value={cat.tags} 
@@ -236,11 +248,6 @@ export default function ContentManager() {
                   </div>
                 </div>
               ))}
-              {(!formData.categoryList || formData.categoryList.length === 0) && (
-                <div className="text-center py-8 border border-dashed border-white/10 rounded-xl text-white/40 text-sm">
-                  No categories added yet. Click the button above to start.
-                </div>
-              )}
             </div>
           </div>
         )}

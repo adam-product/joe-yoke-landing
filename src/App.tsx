@@ -17,8 +17,11 @@ const supabaseUrl = `https://${projectId}.supabase.co`;
 const supabase = createClient(supabaseUrl, publicAnonKey);
 
 export const trackEvent = async (eventName: string) => {
-  const visitorId = localStorage.getItem('joeyoke_visitor_id');
-  if (!visitorId) return; 
+  let visitorId = localStorage.getItem('joeyoke_visitor_id');
+  if (!visitorId) {
+    visitorId = crypto.randomUUID();
+    localStorage.setItem('joeyoke_visitor_id', visitorId);
+  }
 
   await supabase.from('events').insert([{
     event_name: eventName,
@@ -73,10 +76,16 @@ function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v:
   const pillNavRefs = useRef<(HTMLButtonElement | null)[]>([])
   const [pillStyle, setPillStyle] = useState({ left: 0, width: 0 })
   const manualNav = useRef(false)
+  const navigate = useNavigate()
 
   const scrollTo = (i: number) => {
     manualNav.current = true
     setActiveNav(i)
+    if (i === 2) {
+      trackEvent('download_nav_click');
+      navigate('/download');
+      return;
+    }
     const el = document.getElementById(NAV_TARGETS[i])
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     setTimeout(() => { manualNav.current = false }, 900)
@@ -169,7 +178,7 @@ function Hero({ dark }: { dark: boolean }) {
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.45 }}>
             <button 
               onClick={() => {
-                trackEvent('download_page_click');
+                trackEvent('download_hero_click');
                 navigate('/download');
               }}
               className={`group flex items-center gap-3 rounded-full pl-6 pr-2 py-2 font-semibold text-sm transition-colors w-fit ${dark ? 'bg-white text-[#0A0A0A] hover:bg-white/90' : 'bg-[#1A1A1A] text-white hover:bg-[#0A0A0A]'}`}
@@ -272,7 +281,13 @@ function TrendingGames({ dark }: { dark: boolean }) {
         <FadeUp>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 md:mb-12 gap-4 w-full">
             <div className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-none transition-colors duration-500 break-words w-full [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('games', 'sectionTitle'))} />
-            <button onClick={() => navigate('/games')} className={`group inline-flex items-center gap-2 text-xs md:text-sm font-semibold transition-colors w-fit shrink-0 ${dark ? 'text-white/40 hover:text-white' : 'text-[#1A1A1A]/50 hover:text-[#1A1A1A]'}`}>
+            <button 
+              onClick={() => {
+                trackEvent('explore_games_click');
+                navigate('/games');
+              }} 
+              className={`group inline-flex items-center gap-2 text-xs md:text-sm font-semibold transition-colors w-fit shrink-0 ${dark ? 'text-white/40 hover:text-white' : 'text-[#1A1A1A]/50 hover:text-[#1A1A1A]'}`}
+            >
               View all <ArrowRight className="w-3 h-3 md:w-4 md:h-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
@@ -391,7 +406,7 @@ function Footer({ dark }: { dark: boolean }) {
             </div>
             <button 
               onClick={() => {
-                trackEvent('download_page_click');
+                trackEvent('download_footer_click');
                 navigate('/download');
               }}
               className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 md:py-2.5 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
@@ -458,6 +473,7 @@ function LiquidGlassBar({ dark }: { dark: boolean }) {
 export default function App() {
   const [darkMode, setDarkMode] = useState(false)
 
+  // Track visits along with OS, Traffic Source, and Language/Country info
   useEffect(() => {
     const trackVisit = async () => {
       let visitorId = localStorage.getItem('joeyoke_visitor_id');
@@ -465,15 +481,41 @@ export default function App() {
         visitorId = crypto.randomUUID();
         localStorage.setItem('joeyoke_visitor_id', visitorId);
       }
+      
       const ua = navigator.userAgent;
       let deviceType = 'Desktop';
-      if (/mobile|android|iphone/i.test(ua)) deviceType = 'Mobile';
-      else if (/tablet|ipad/i.test(ua)) deviceType = 'Tablet';
+      let os = 'Windows';
+
+      if (/android/i.test(ua)) { deviceType = 'Mobile'; os = 'Android'; }
+      else if (/iphone|ipad|ipod/i.test(ua)) { deviceType = /ipad/i.test(ua) ? 'Tablet' : 'Mobile'; os = 'iOS'; }
+      else if (/mac/i.test(ua)) { os = 'macOS'; }
+      else if (/linux/i.test(ua)) { os = 'Linux'; }
+
+      // Referral detection
+      let trafficSource = 'Direct';
+      const ref = document.referrer;
+      if (ref) {
+        if (ref.includes('google') || ref.includes('bing') || ref.includes('yahoo')) trafficSource = 'Organic Search';
+        else if (ref.includes('t.co') || ref.includes('twitter') || ref.includes('facebook') || ref.includes('instagram') || ref.includes('discord')) trafficSource = 'Social Media';
+        else trafficSource = 'Referral';
+      }
+
+      // Locale-based Country mapping
+      const userLang = navigator.language || 'en-US';
+      const countryMap: Record<string, string> = {
+        'en-IN': 'India', 'hi': 'India', 'bn-BD': 'Bangladesh', 'ur-PK': 'Pakistan',
+        'en-GB': 'United Kingdom', 'en-US': 'United States', 'en-AU': 'Australia',
+        'ar-AE': 'UAE', 'ar-SA': 'Saudi Arabia', 'en-CA': 'Canada', 'en-LK': 'Sri Lanka'
+      };
+      const country = countryMap[userLang] || 'United States';
 
       await supabase.from('page_views').insert([{
         path: window.location.pathname,
         device_type: deviceType,
-        visitor_id: visitorId
+        visitor_id: visitorId,
+        os,
+        traffic_source: trafficSource,
+        country
       }]);
     };
     
