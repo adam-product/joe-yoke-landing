@@ -146,6 +146,7 @@ function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v:
   )
 }
 
+// ─── Hero ─────────────────────────────────────────────────────────────────────
 function Hero({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const heroSrc = get('hero', 'heroImage') || pyramidImg
@@ -153,10 +154,10 @@ function Hero({ dark }: { dark: boolean }) {
   return (
     <section className={`min-h-screen flex items-center px-6 md:px-12 pt-20 pb-16 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8 overflow-hidden">
-        {/* Left Side: min-w-0 prevents text from pushing the image out of the container */}
-        <div className="flex-1 flex flex-col gap-8 min-w-0 w-full z-10">
+        
+        {/* Left Side: Takes up 60% on tablet, 66% on desktop for wider text breathing room */}
+        <div className="w-full md:w-3/5 lg:w-2/3 flex flex-col gap-8 z-10 shrink-0">
           <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.9, ease, delay: 0.1 }}>
-            {/* Added break-words and leading-[1.1] to prevent giant lines */}
             <div className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tighter transition-colors duration-500 break-words [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('hero', 'headline'))} />
           </motion.div>
 
@@ -172,14 +173,15 @@ function Hero({ dark }: { dark: boolean }) {
           </motion.div>
         </div>
 
-        {/* Right Side: Mockup Image */}
-        <div className="flex-1 flex items-center justify-center min-w-0 w-full">
+        {/* Right Side: Takes up 40% on tablet, 33% on desktop, pushed to the far right */}
+        <div className="w-full md:w-2/5 lg:w-1/3 flex items-center justify-center md:justify-end">
           <motion.div animate={{ y: [0, -22, 0] }} transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}>
             <motion.div initial={{ opacity: 0, scale: 0.85, rotate: -8 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>
               <img src={heroSrc} alt="Hero mockup" className="w-72 h-72 sm:w-96 sm:h-96 lg:w-[480px] lg:h-[480px] object-contain drop-shadow-2xl select-none" draggable={false} />
             </motion.div>
           </motion.div>
         </div>
+        
       </div>
     </section>
   )
