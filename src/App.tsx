@@ -70,6 +70,107 @@ const renderHTML = (html: string) => {
   return { __html: html };
 };
 
+// Text that reveals #CCFF00 in a soft radial spotlight following the cursor,
+// otherwise sits at whatever dim color it's given (e.g. rgba(255,255,255,0.03)).
+function CursorRevealText({ text, className, style, baseColor = 'rgba(255,255,255,0.03)' }: { text: string; className?: string; style?: React.CSSProperties; baseColor?: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const [pos, setPos] = useState({ x: 50, y: 50 })
+  const [active, setActive] = useState(false)
+
+  const handleMove = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const rect = ref.current?.getBoundingClientRect()
+    if (!rect) return
+    setPos({ x: ((e.clientX - rect.left) / rect.width) * 100, y: ((e.clientY - rect.top) / rect.height) * 100 })
+  }
+
+  return (
+    <span
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => setActive(false)}
+      className={className}
+      style={{
+        ...style,
+        pointerEvents: 'auto',
+        backgroundImage: `radial-gradient(circle 260px at ${pos.x}% ${pos.y}%, #CCFF00 0%, #CCFF00 15%, ${baseColor} 65%)`,
+        WebkitBackgroundClip: 'text',
+        backgroundClip: 'text',
+        color: 'transparent',
+        transition: active ? 'background-image 0.05s linear' : 'background-image 0.7s ease',
+      }}
+    >
+      {text}
+    </span>
+  )
+}
+
+// Soft glow blob that trails the cursor across the whole page, blended so it
+// reads on both the dark and light section backgrounds.
+function CursorGlow({ dark }: { dark: boolean }) {
+  const glowRef = useRef<HTMLDivElement>(null)
+  const pos = useRef({ x: -500, y: -500 })
+  const target = useRef({ x: -500, y: -500 })
+
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) => { target.current = { x: e.clientX, y: e.clientY } }
+    window.addEventListener('mousemove', handleMove)
+
+    let raf: number
+    const animate = () => {
+      pos.current.x += (target.current.x - pos.current.x) * 0.12
+      pos.current.y += (target.current.y - pos.current.y) * 0.12
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate3d(${pos.current.x - 220}px, ${pos.current.y - 220}px, 0)`
+      }
+      raf = requestAnimationFrame(animate)
+    }
+    raf = requestAnimationFrame(animate)
+    return () => { window.removeEventListener('mousemove', handleMove); cancelAnimationFrame(raf) }
+  }, [])
+
+  return (
+    <div
+      ref={glowRef}
+      className="fixed top-0 left-0 w-[440px] h-[440px] rounded-full z-30 pointer-events-none"
+      style={{
+        background: 'radial-gradient(circle, rgba(204,255,0,0.18) 0%, rgba(204,255,0,0.06) 45%, transparent 72%)',
+        mixBlendMode: dark ? 'screen' : 'multiply',
+        filter: 'blur(10px)',
+        willChange: 'transform',
+      }}
+    />
+  )
+}
+
+// Wraps a button/element so it gently pulls toward the cursor on hover.
+function Magnetic({ children, strength = 0.35 }: { children: ReactNode; strength?: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [offset, setOffset] = useState({ x: 0, y: 0 })
+
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = ref.current?.getBoundingClientRect()
+    if (!rect) return
+    setOffset({
+      x: (e.clientX - (rect.left + rect.width / 2)) * strength,
+      y: (e.clientY - (rect.top + rect.height / 2)) * strength,
+    })
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={() => setOffset({ x: 0, y: 0 })}
+      animate={{ x: offset.x, y: offset.y }}
+      transition={{ type: 'spring', stiffness: 150, damping: 15, mass: 0.1 }}
+      className="inline-block"
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v: boolean) => void }) {
   const [activeNav, setActiveNav] = useState(0)
   const [scrolled, setScrolled] = useState(false)
@@ -176,18 +277,20 @@ function Hero({ dark }: { dark: boolean }) {
           </motion.div>
           <motion.div className={`w-full max-w-md break-words text-base md:text-lg leading-relaxed transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }} dangerouslySetInnerHTML={renderHTML(get('hero', 'subtext'))} />
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.45 }}>
-            <button 
-              onClick={() => {
-                trackEvent('download_hero_click');
-                navigate('/download');
-              }}
-              className={`group flex items-center gap-3 rounded-full pl-6 pr-2 py-2 font-semibold text-sm transition-colors w-fit ${dark ? 'bg-white text-[#0A0A0A] hover:bg-white/90' : 'bg-[#1A1A1A] text-white hover:bg-[#0A0A0A]'}`}
-            >
-              <span dangerouslySetInnerHTML={renderHTML(get('hero', 'ctaLabel'))} />
-              <span className="w-8 h-8 rounded-full bg-[#C5FF00] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300">
-                <ArrowRight className="w-4 h-4 text-[#1A1A1A]" />
-              </span>
-            </button>
+            <Magnetic>
+              <button 
+                onClick={() => {
+                  trackEvent('download_hero_click');
+                  navigate('/download');
+                }}
+                className={`group flex items-center gap-3 rounded-full pl-6 pr-2 py-2 font-semibold text-sm transition-colors w-fit ${dark ? 'bg-white text-[#0A0A0A] hover:bg-white/90' : 'bg-[#1A1A1A] text-white hover:bg-[#0A0A0A]'}`}
+              >
+                <span dangerouslySetInnerHTML={renderHTML(get('hero', 'ctaLabel'))} />
+                <span className="w-8 h-8 rounded-full bg-[#C5FF00] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300">
+                  <ArrowRight className="w-4 h-4 text-[#1A1A1A]" />
+                </span>
+              </button>
+            </Magnetic>
           </motion.div>
         </div>
         <div className="w-full md:w-2/5 lg:w-1/3 flex items-center justify-center md:justify-end">
@@ -372,15 +475,17 @@ function CommunityStats({ dark }: { dark: boolean }) {
                 <p className="text-[10px] md:text-xs font-bold text-white/30 tracking-widest uppercase mb-3 md:mb-4">Our Community</p>
                 <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter leading-[1.1] break-words w-full [&_p]:m-0" dangerouslySetInnerHTML={renderHTML(get('stats', 'headline'))} />
               </div>
-              <button 
-                onClick={() => trackEvent('join_discord_click')}
-                className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
-              >
-                <span dangerouslySetInnerHTML={renderHTML(get('stats', 'ctaLabel'))} className="[&_p]:m-0" />
-                <span className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300 shrink-0">
-                  <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-[#C5FF00]" />
-                </span>
-              </button>
+              <Magnetic>
+                <button 
+                  onClick={() => trackEvent('join_discord_click')}
+                  className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
+                >
+                  <span dangerouslySetInnerHTML={renderHTML(get('stats', 'ctaLabel'))} className="[&_p]:m-0" />
+                  <span className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300 shrink-0">
+                    <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-[#C5FF00]" />
+                  </span>
+                </button>
+              </Magnetic>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4 w-full">
               {stats.map((stat, i) => (
@@ -412,18 +517,20 @@ function Footer({ dark }: { dark: boolean }) {
               <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaHeadline'))} />
               <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaTagline'))} />
             </div>
-            <button 
-              onClick={() => {
-                trackEvent('download_footer_click');
-                navigate('/download');
-              }}
-              className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 md:py-2.5 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
-            >
-              <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaBtn'))} className="[&_p]:m-0" />
-              <span className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300 shrink-0">
-                <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-[#C5FF00]" />
-              </span>
-            </button>
+            <Magnetic>
+              <button 
+                onClick={() => {
+                  trackEvent('download_footer_click');
+                  navigate('/download');
+                }}
+                className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 md:py-2.5 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
+              >
+                <span dangerouslySetInnerHTML={renderHTML(get('footer', 'ctaBtn'))} className="[&_p]:m-0" />
+                <span className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300 shrink-0">
+                  <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-[#C5FF00]" />
+                </span>
+              </button>
+            </Magnetic>
           </div>
         </FadeUp>
         <FadeUp delay={0.1} className="w-full">
@@ -444,8 +551,12 @@ function Footer({ dark }: { dark: boolean }) {
           <span dangerouslySetInnerHTML={renderHTML(get('footer', 'copyright'))} />
         </div>
       </div>
-      <div className="relative overflow-hidden h-20 sm:h-28 md:h-44 flex items-end pointer-events-none select-none" aria-hidden>
-        <span className="absolute bottom-[-0.15em] left-1/2 -translate-x-1/2 whitespace-nowrap font-black tracking-tighter leading-none" style={{ fontSize: 'clamp(60px, 18vw, 220px)', color: 'rgba(255,255,255,0.03)' }}>JOE YOKE</span>
+      <div className="relative overflow-hidden h-20 sm:h-28 md:h-44 flex items-end select-none" aria-hidden>
+        <CursorRevealText
+          text="JOE YOKE"
+          className="absolute bottom-[-0.15em] left-1/2 -translate-x-1/2 whitespace-nowrap font-black tracking-tighter leading-none"
+          style={{ fontSize: 'clamp(60px, 18vw, 220px)' }}
+        />
       </div>
     </footer>
   )
@@ -555,6 +666,7 @@ export default function App() {
 
   return (
     <div className={`font-sans antialiased overflow-x-hidden w-full relative min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
+      <CursorGlow dark={darkMode} />
       <Header darkMode={darkMode} setDarkMode={setDarkMode} />
       <LiquidGlassBar dark={darkMode} />
       <main>
