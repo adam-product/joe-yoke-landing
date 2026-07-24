@@ -144,11 +144,15 @@ function Hero({ dark }: { dark: boolean }) {
   return (
     <section className={`min-h-screen flex items-center px-4 sm:px-6 md:px-12 pt-24 md:pt-20 pb-16 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8 overflow-hidden">
+        
         <div className="w-full md:w-3/5 lg:w-2/3 flex flex-col gap-6 md:gap-8 z-10 shrink-0 min-w-0">
           <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.9, ease, delay: 0.1 }}>
             <div className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tighter transition-colors duration-500 break-words w-full [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('hero', 'headline'))} />
           </motion.div>
-          <motion.div className={`text-base md:text-lg max-w-md leading-relaxed transition-colors duration-500 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }} dangerouslySetInnerHTML={renderHTML(get('hero', 'subtext'))} />
+
+          {/* FIX: Added w-full, break-words, and [&_p]:m-0 to the subtext container to force wrapping */}
+          <motion.div className={`w-full max-w-md break-words text-base md:text-lg leading-relaxed transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }} dangerouslySetInnerHTML={renderHTML(get('hero', 'subtext'))} />
+
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.45 }}>
             <button className={`group flex items-center gap-3 rounded-full pl-6 pr-2 py-2 font-semibold text-sm transition-colors w-fit ${dark ? 'bg-white text-[#0A0A0A] hover:bg-white/90' : 'bg-[#1A1A1A] text-white hover:bg-[#0A0A0A]'}`}>
               <span dangerouslySetInnerHTML={renderHTML(get('hero', 'ctaLabel'))} />
@@ -158,6 +162,7 @@ function Hero({ dark }: { dark: boolean }) {
             </button>
           </motion.div>
         </div>
+
         <div className="w-full md:w-2/5 lg:w-1/3 flex items-center justify-center md:justify-end">
           <motion.div animate={{ y: [0, -22, 0] }} transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}>
             <motion.div initial={{ opacity: 0, scale: 0.85, rotate: -8 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1, ease, delay: 0.2 }}>
@@ -165,6 +170,7 @@ function Hero({ dark }: { dark: boolean }) {
             </motion.div>
           </motion.div>
         </div>
+        
       </div>
     </section>
   )
