@@ -4,11 +4,12 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Search, Sun, Moon, Gamepad2 } from 'lucide-react'
 import { useGames, badgeColor, type GameEntry } from './admin/GamesContext'
 import { useTheme } from './ThemeContext'
+import logoNavLight from '@/imports/logo-nav-light.png'
+import logoNavDark from '@/imports/logo-nav-dark.png'
 import gameImg1 from '@/imports/photo_2026-07-23_20-54-30.jpg'
 import gameImg2 from '@/imports/photo_2026-07-23_20-54-27.jpg'
 import gameImg3 from '@/imports/photo_2026-07-23_20-54-21.jpg'
 import gameImg4 from '@/imports/photo_2026-07-23_20-54-19.jpg'
-import faviconImg from '@/imports/favicon.ico-1.jpg'
 
 // Images are matched to games by creation order (id 1 → first image, id 2 → second, …),
 // mirroring exactly how the homepage's Trending Games section maps them. Using
@@ -156,7 +157,7 @@ export default function AllGames() {
           </button>
 
           <div className="flex items-center gap-2 ml-2">
-            <img src={faviconImg} alt="Joe Yoke" className="w-6 h-6 rounded-lg object-cover" />
+            <img src={darkMode ? logoNavLight : logoNavDark} alt="Joe Yoke" className="w-6 h-6 rounded-lg object-cover" />
             <span className={`font-black text-sm tracking-tighter uppercase ${darkMode ? 'text-white/70' : 'text-[#1A1A1A]/70'}`}>Joe Yoke</span>
           </div>
 
