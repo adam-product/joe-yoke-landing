@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import App from './App.tsx'
 import DownloadPage from './DownloadPage.tsx'
+import AllGames from './AllGames.tsx'
 import Login from './admin/Login.tsx'
 import AdminShell from './admin/AdminShell.tsx'
 import Dashboard from './admin/Dashboard.tsx'
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
   {
     path: "/download",
     element: <DownloadPage />,
+  },
+  {
+    path: "/games",
+    element: <AllGames />,
   },
   {
     path: "/admin",
