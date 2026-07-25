@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Search, Sun, Moon, Gamepad2 } from 'lucide-react'
 import { useGames, badgeColor, type GameEntry } from './admin/GamesContext'
+import { useTheme } from './ThemeContext'
 import gameImg1 from '@/imports/photo_2026-07-23_20-54-30.jpg'
 import gameImg2 from '@/imports/photo_2026-07-23_20-54-27.jpg'
 import gameImg3 from '@/imports/photo_2026-07-23_20-54-21.jpg'
@@ -116,7 +117,7 @@ export default function AllGames() {
   const { games } = useGames()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('All')
-  const [darkMode, setDarkMode] = useState(true)
+  const { darkMode, toggleDarkMode } = useTheme()
 
   const filtered = games.filter(g => {
     const matchBadge = filter === 'All' || g.badge === filter
@@ -174,7 +175,7 @@ export default function AllGames() {
 
           {/* Theme toggle */}
           <button
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={toggleDarkMode}
             className={`flex items-center gap-1.5 text-xs font-semibold transition-all ml-4 ${darkMode ? 'text-white/50 hover:text-white' : 'text-[#1A1A1A]/55 hover:text-[#1A1A1A]'}`}
           >
             {darkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}

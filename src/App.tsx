@@ -13,6 +13,7 @@ import gameImg3 from '@/imports/photo_2026-07-23_20-54-21.jpg'
 import gameImg4 from '@/imports/photo_2026-07-23_20-54-19.jpg'
 import { useGames } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
+import { useTheme } from './ThemeContext'
 
 const supabaseUrl = `https://${projectId}.supabase.co`;
 const supabase = createClient(supabaseUrl, publicAnonKey);
@@ -561,7 +562,7 @@ function LiquidGlassBar({ dark }: { dark: boolean }) {
 }
 
 export default function App() {
-  const [darkMode, setDarkMode] = useState(false)
+  const { darkMode, setDarkMode } = useTheme()
 
   // Robust visit tracker with IP API + Timezone fallback + User Agent OS parser
   useEffect(() => {

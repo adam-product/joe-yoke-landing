@@ -12,6 +12,7 @@ import ContentManager from './admin/ContentManager.tsx'
 import { AuthProvider } from './admin/AuthContext.tsx'
 import { ContentProvider } from './admin/ContentContext.tsx'
 import { GamesProvider } from './admin/GamesContext.tsx'
+import { ThemeProvider } from './ThemeContext.tsx'
 import './index.css'
 
 const router = createBrowserRouter([
@@ -53,12 +54,14 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <ContentProvider>
-        <GamesProvider>
-          <RouterProvider router={router} />
-        </GamesProvider>
-      </ContentProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ContentProvider>
+          <GamesProvider>
+            <RouterProvider router={router} />
+          </GamesProvider>
+        </ContentProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </StrictMode>,
 )
