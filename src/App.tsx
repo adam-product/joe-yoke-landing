@@ -196,7 +196,7 @@ function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v:
     <motion.header className="fixed top-0 inset-x-0 z-50 pointer-events-none" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease }}>
       <motion.div className="flex items-center justify-between px-4 sm:px-8 md:px-14 py-4 md:py-5 w-full" animate={{ opacity: scrolled ? 0 : 1 }} transition={{ duration: 0.25 }} style={{ pointerEvents: scrolled ? 'none' : 'auto' }}>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg overflow-hidden shrink-0"><img src={darkMode ? logoNavLight : logoNavDark} alt="Joe Yoke" className="w-full h-full object-cover" /></div>
+          <div className="w-9 h-9 md:w-11 md:h-11 rounded-lg overflow-hidden shrink-0"><img src={darkMode ? logoNavLight : logoNavDark} alt="Joe Yoke" className="w-full h-full object-cover" /></div>
           <span className={`font-black text-sm tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>Joe Yoke</span>
         </div>
         <nav className="flex-1 hidden md:flex items-center justify-center gap-1">
@@ -213,7 +213,7 @@ function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v:
       <motion.div className="absolute top-2 md:top-4 inset-x-0 flex justify-center px-2" animate={{ opacity: scrolled ? 1 : 0, y: scrolled ? 0 : -8 }} transition={{ duration: 0.3 }} style={{ pointerEvents: scrolled ? 'auto' : 'none' }}>
         <div className={`flex items-center justify-between gap-1 md:gap-2 px-2 md:px-4 py-1.5 md:py-2.5 rounded-full border transition-all duration-300 ${darkMode ? 'bg-[#111111]/90 backdrop-blur-md shadow-lg shadow-black/30 border-white/10' : 'bg-white/90 backdrop-blur-md shadow-lg shadow-black/5 border-[#E5E7EB]'}`} style={{ maxWidth: 720, width: '100%' }}>
           <div className="flex items-center gap-1.5 md:gap-2 shrink-0 md:mr-2">
-            <div className="w-6 h-6 md:w-8 md:h-8 rounded-xl overflow-hidden shrink-0"><img src={darkMode ? logoNavLight : logoNavDark} alt="Joe Yoke" className="w-full h-full object-cover" /></div>
+            <div className="w-7 h-7 md:w-9 md:h-9 rounded-xl overflow-hidden shrink-0"><img src={darkMode ? logoNavLight : logoNavDark} alt="Joe Yoke" className="w-full h-full object-cover" /></div>
             <span className={`hidden sm:block font-black text-sm tracking-tighter uppercase transition-colors ${darkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>Joe Yoke</span>
           </div>
           <nav className="flex-1 flex items-center justify-center min-w-0">
