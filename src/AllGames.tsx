@@ -24,6 +24,11 @@ function fallbackImageFor(game: GameEntry): string {
 
 const ease = [0.16, 1, 0.3, 1] as const
 
+// Raw brand lime (#C5FF00) reads great on the dark theme but is nearly
+// invisible as text against the light off-white background. Use a darker
+// olive tone for lime-colored text specifically in light mode.
+const LIME_LIGHT_TEXT = '#5C7A00'
+
 const BADGE_OPTIONS = ['All', 'STRATEGY', 'CUE SPORTS', 'BOARD', 'PARTY', 'ACTION', 'PUZZLE', 'SPORTS', 'TRIVIA']
 
 // Same magnetic-pull micro-interaction used elsewhere on the site, so buttons
@@ -94,10 +99,10 @@ function GameCard({ game, dark, size = 'normal' }: { game: GameEntry; dark: bool
           <p className={`relative text-white/50 leading-relaxed ${spotlight ? 'text-sm md:text-base max-w-md mb-4' : 'text-xs line-clamp-2 mb-0'}`}>{game.description}</p>
           <Magnetic strength={spotlight ? 0.15 : 0.1}>
             <button
-              className={`relative flex items-center justify-center gap-1.5 rounded-xl font-bold transition-all ${spotlight ? 'mt-1 px-6 py-2.5 text-sm w-fit' : 'mt-3 w-full py-2 text-xs'}`}
+              className={`relative flex items-center justify-center gap-2 rounded-xl font-bold transition-all ${spotlight ? 'mt-1 px-6 py-2.5 text-sm w-fit' : 'mt-3 w-full px-4 py-2.5 text-xs'}`}
               style={{ background: `${accent}1c`, color: accent, border: `1px solid ${accent}40` }}
             >
-              Play Now <ArrowUpRight className={spotlight ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
+              <span>Play Now</span> <ArrowUpRight className={spotlight ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
             </button>
           </Magnetic>
         </div>
@@ -187,13 +192,13 @@ export default function AllGames() {
           className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
         >
           <div>
-            <div className={`flex items-center gap-2 mb-3 text-xs font-bold tracking-widest uppercase ${darkMode ? 'text-[#C5FF00]/80' : 'text-[#1A1A1A]/50'}`}>
+            <div className={`flex items-center gap-2 mb-3 text-xs font-bold tracking-widest uppercase ${darkMode ? 'text-[#C5FF00]/80' : ''}`} style={darkMode ? undefined : { color: LIME_LIGHT_TEXT }}>
               <Gamepad2 className="w-3.5 h-3.5" /> Game Library
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-none mb-3">
               All Games
             </h1>
-            <p className={darkMode ? 'text-white/40 text-lg' : 'text-[#1A1A1A]/45 text-lg'}>
+            <p className={darkMode ? 'text-white/40 text-lg' : 'text-[#1A1A1A]/70 text-lg'}>
               {games.length} game{games.length !== 1 ? 's' : ''} — play anything, connect with everyone.
             </p>
           </div>
@@ -204,8 +209,8 @@ export default function AllGames() {
                 key={stat.label}
                 className={`rounded-2xl px-4 py-3 md:px-5 md:py-3.5 border text-center min-w-[84px] ${darkMode ? 'bg-white/5 border-white/10' : 'bg-black/[0.03] border-black/10'}`}
               >
-                <div className="text-xl md:text-2xl font-black tracking-tight text-[#C5FF00] leading-none">{stat.value}</div>
-                <div className={`text-[10px] font-semibold tracking-wide uppercase mt-1 ${darkMode ? 'text-white/35' : 'text-[#1A1A1A]/40'}`}>{stat.label}</div>
+                <div className="text-xl md:text-2xl font-black tracking-tight leading-none" style={{ color: darkMode ? '#C5FF00' : LIME_LIGHT_TEXT }}>{stat.value}</div>
+                <div className={`text-[10px] font-semibold tracking-wide uppercase mt-1 ${darkMode ? 'text-white/35' : 'text-[#1A1A1A]/60'}`}>{stat.label}</div>
               </div>
             ))}
           </div>
@@ -230,11 +235,11 @@ export default function AllGames() {
           className="flex flex-wrap gap-2 mb-10"
         >
           {BADGE_OPTIONS.filter(b => b === 'All' || games.some(g => g.badge === b)).map(b => {
-            const color = b === 'All' ? '#C5FF00' : badgeColor(b)
+            const color = b === 'All' ? (darkMode ? '#C5FF00' : LIME_LIGHT_TEXT) : badgeColor(b)
             const active = filter === b
             const count = b === 'All' ? games.length : categoryCounts[b] ?? 0
             const inactiveBg = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'
-            const inactiveText = darkMode ? 'rgba(255,255,255,0.35)' : 'rgba(26,26,26,0.45)'
+            const inactiveText = darkMode ? 'rgba(255,255,255,0.35)' : 'rgba(26,26,26,0.65)'
             const inactiveBorder = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
             return (
               <button
