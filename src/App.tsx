@@ -70,8 +70,9 @@ const renderHTML = (html: string) => {
   return { __html: html };
 };
 
-// Text that reveals #CCFF00 in a soft radial spotlight following the cursor,
-// otherwise sits at whatever dim color it's given (e.g. rgba(255,255,255,0.03)).
+// Lime glow that snaps to the cursor instantly, but fades out slowly when the
+// cursor leaves. Uses a mask on a colored copy of the text so the fade is a
+// smooth opacity transition rather than an unanimatable gradient jump.
 function CursorRevealText({ text, className, style, baseColor = 'rgba(255,255,255,0.03)' }: { text: string; className?: string; style?: React.CSSProperties; baseColor?: string }) {
   const ref = useRef<HTMLSpanElement>(null)
   const [pos, setPos] = useState({ x: 50, y: 50 })
@@ -83,6 +84,8 @@ function CursorRevealText({ text, className, style, baseColor = 'rgba(255,255,25
     setPos({ x: ((e.clientX - rect.left) / rect.width) * 100, y: ((e.clientY - rect.top) / rect.height) * 100 })
   }
 
+  const mask = `radial-gradient(circle 260px at ${pos.x}% ${pos.y}%, black 0%, black 25%, transparent 70%)`
+
   return (
     <span
       ref={ref}
@@ -90,56 +93,23 @@ function CursorRevealText({ text, className, style, baseColor = 'rgba(255,255,25
       onMouseEnter={() => setActive(true)}
       onMouseLeave={() => setActive(false)}
       className={className}
-      style={{
-        ...style,
-        pointerEvents: 'auto',
-        backgroundImage: `radial-gradient(circle 260px at ${pos.x}% ${pos.y}%, #CCFF00 0%, #CCFF00 15%, ${baseColor} 65%)`,
-        WebkitBackgroundClip: 'text',
-        backgroundClip: 'text',
-        color: 'transparent',
-        transition: active ? 'background-image 0.05s linear' : 'background-image 0.7s ease',
-      }}
+      style={{ ...style, pointerEvents: 'auto', color: baseColor }}
     >
       {text}
+      <span
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          color: '#CCFF00',
+          WebkitMaskImage: mask,
+          maskImage: mask,
+          opacity: active ? 1 : 0,
+          transition: active ? 'opacity 0.15s ease' : 'opacity 1.6s ease',
+        }}
+      >
+        {text}
+      </span>
     </span>
-  )
-}
-
-// Soft glow blob that trails the cursor across the whole page, blended so it
-// reads on both the dark and light section backgrounds.
-function CursorGlow({ dark }: { dark: boolean }) {
-  const glowRef = useRef<HTMLDivElement>(null)
-  const pos = useRef({ x: -500, y: -500 })
-  const target = useRef({ x: -500, y: -500 })
-
-  useEffect(() => {
-    const handleMove = (e: MouseEvent) => { target.current = { x: e.clientX, y: e.clientY } }
-    window.addEventListener('mousemove', handleMove)
-
-    let raf: number
-    const animate = () => {
-      pos.current.x += (target.current.x - pos.current.x) * 0.12
-      pos.current.y += (target.current.y - pos.current.y) * 0.12
-      if (glowRef.current) {
-        glowRef.current.style.transform = `translate3d(${pos.current.x - 220}px, ${pos.current.y - 220}px, 0)`
-      }
-      raf = requestAnimationFrame(animate)
-    }
-    raf = requestAnimationFrame(animate)
-    return () => { window.removeEventListener('mousemove', handleMove); cancelAnimationFrame(raf) }
-  }, [])
-
-  return (
-    <div
-      ref={glowRef}
-      className="fixed top-0 left-0 w-[440px] h-[440px] rounded-full z-30 pointer-events-none"
-      style={{
-        background: 'radial-gradient(circle, rgba(204,255,0,0.18) 0%, rgba(204,255,0,0.06) 45%, transparent 72%)',
-        mixBlendMode: dark ? 'screen' : 'multiply',
-        filter: 'blur(10px)',
-        willChange: 'transform',
-      }}
-    />
   )
 }
 
@@ -666,7 +636,6 @@ export default function App() {
 
   return (
     <div className={`font-sans antialiased overflow-x-hidden w-full relative min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
-      <CursorGlow dark={darkMode} />
       <Header darkMode={darkMode} setDarkMode={setDarkMode} />
       <LiquidGlassBar dark={darkMode} />
       <main>
