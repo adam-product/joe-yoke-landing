@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createHead, UnheadProvider } from '@unhead/react/client'
 import App from './App.tsx'
 import DownloadPage from './DownloadPage.tsx'
 import AllGames from './AllGames.tsx'
@@ -15,7 +16,10 @@ import { AuthProvider } from './admin/AuthContext.tsx'
 import { ContentProvider } from './admin/ContentContext.tsx'
 import { GamesProvider } from './admin/GamesContext.tsx'
 import { ThemeProvider } from './ThemeContext.tsx'
+import Seo from './Seo.tsx'
 import './index.css'
+
+const head = createHead()
 
 const publicRoutes = [
   {
@@ -39,11 +43,21 @@ const publicRoutes = [
 const adminRoutes = [
   {
     path: "/",
-    element: <Login />,
+    element: (
+      <>
+        <Seo title="Joe Yoke Admin" description="Joe Yoke website administration." path="/" noIndex />
+        <Login />
+      </>
+    ),
   },
   {
     path: "/",
-    element: <AdminShell />,
+    element: (
+      <>
+        <Seo title="Joe Yoke Admin" description="Joe Yoke website administration." path="/" noIndex />
+        <AdminShell />
+      </>
+    ),
     children: [
       {
         path: "dashboard",
@@ -79,14 +93,16 @@ const router = isAdminHostname
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider>
-      <AuthProvider>
-        <ContentProvider>
-          <GamesProvider>
-            <RouterProvider router={router} />
-          </GamesProvider>
-        </ContentProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <UnheadProvider head={head}>
+      <ThemeProvider>
+        <AuthProvider>
+          <ContentProvider>
+            <GamesProvider>
+              <RouterProvider router={router} />
+            </GamesProvider>
+          </ContentProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </UnheadProvider>
   </StrictMode>,
 )

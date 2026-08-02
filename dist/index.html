@@ -1,13 +1,50 @@
 <!doctype html>
-<html lang="<!-- figma:lang -->">
+<html lang="en">
   <head>
     <!-- figma:head-start -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Joe Yoke</title>
+    <link id="app-favicon" rel="icon" type="image/png" href="/favicon.png" />
+    <script>
+      (() => {
+        const adminHostnames = [
+          'admin.joeyoke.com',
+          'joeyokeadmin.joeyoke.com',
+        ]
+
+        if (adminHostnames.includes(window.location.hostname.toLowerCase())) {
+          const favicon = document.getElementById('app-favicon')
+          favicon.type = 'image/jpeg'
+          favicon.href = '/admin-favicon.jpg'
+        }
+      })()
+    </script>
+    <title>Joe Yoke – Multiplayer Games and Gaming Community</title>
+    <meta
+      name="description"
+      content="Play multiplayer games, discover new favorites, connect with friends, and join the Joe Yoke gaming community."
+    />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://joeyoke.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Joe Yoke" />
+    <meta property="og:title" content="Joe Yoke – Multiplayer Games and Gaming Community" />
+    <meta
+      property="og:description"
+      content="Play multiplayer games, discover new favorites, connect with friends, and join the Joe Yoke gaming community."
+    />
+    <meta property="og:url" content="https://joeyoke.com/" />
+    <meta property="og:image" content="https://joeyoke.com/favicon.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Joe Yoke – Multiplayer Games and Gaming Community" />
+    <meta
+      name="twitter:description"
+      content="Play multiplayer games, discover new favorites, connect with friends, and join the Joe Yoke gaming community."
+    />
+    <meta name="twitter:image" content="https://joeyoke.com/favicon.png" />
     <!-- figma:head-end -->
-    <script type="module" crossorigin src="/assets/index-iQS7JkY3.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CmwHql-I.css">
+    <script type="module" crossorigin src="/assets/index-B3Z9YMvs.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D79qKOOF.css">
   </head>
   <body>
     <!-- figma:body-start -->

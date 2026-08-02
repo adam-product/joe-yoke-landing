@@ -8,6 +8,7 @@ import { useTheme } from './ThemeContext'
 import { fallbackGameImage } from './gameAssets'
 import logoNavLight from '@/imports/logo-nav-light.png'
 import logoNavDark from '@/imports/logo-nav-dark.png'
+import Seo from './Seo'
 
 // Images are matched to games by creation order (id 1 → first image, id 2 → second, …),
 // mirroring exactly how the homepage's Trending Games section maps them. Using
@@ -167,6 +168,11 @@ export default function AllGames() {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 relative ${darkMode ? 'bg-[#0A0A0A] text-white' : 'bg-[#F8F9FA] text-[#1A1A1A]'}`}>
+      <Seo
+        title="Multiplayer Games to Play With Friends | Joe Yoke"
+        description="Explore Joe Yoke multiplayer games, learn how each game works, and find your next favorite game to play with friends."
+        path="/games"
+      />
       {/* Ambient background glow, matches the brand's lime/dark aesthetic */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden -z-0" aria-hidden>
         <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full blur-[120px]" style={{ background: darkMode ? 'rgba(197,255,0,0.06)' : 'rgba(197,255,0,0.12)' }} />

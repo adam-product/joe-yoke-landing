@@ -15,6 +15,7 @@ import { useGames } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
 import { useTheme } from './ThemeContext'
 import { fallbackGameImage } from './gameAssets'
+import Seo from './Seo'
 
 const supabaseUrl = `https://${projectId}.supabase.co`;
 const supabase = createClient(supabaseUrl, publicAnonKey);
@@ -679,6 +680,11 @@ export default function App() {
 
   return (
     <div className={`font-sans antialiased overflow-x-hidden w-full relative min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
+      <Seo
+        title="Joe Yoke – Multiplayer Games and Gaming Community"
+        description="Play multiplayer games, discover new favorites, connect with friends, and join the Joe Yoke gaming community."
+        path="/"
+      />
       <Header darkMode={darkMode} setDarkMode={setDarkMode} />
       <LiquidGlassBar dark={darkMode} />
       <main>

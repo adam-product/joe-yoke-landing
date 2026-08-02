@@ -8,6 +8,7 @@ import logoNavDark from '@/imports/logo-nav-dark.png';
 // Updated to .png below!
 import appleStoreIcon from '@/imports/Apple App Store icon.png';
 import googlePlayIcon from '@/imports/Google Play Store icon.png';
+import Seo from './Seo';
 
 // Helper to strip HTML tags and sanitize URLs
 const cleanText = (str: string) => {
@@ -49,6 +50,11 @@ export default function DownloadPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex flex-col relative overflow-hidden font-sans antialiased text-white">
+      <Seo
+        title="Download Joe Yoke for iOS and Android"
+        description="Download Joe Yoke for iPhone or Android and start playing multiplayer games with your friends."
+        path="/download"
+      />
       
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#C5FF00]/10 blur-[120px] rounded-full pointer-events-none" />

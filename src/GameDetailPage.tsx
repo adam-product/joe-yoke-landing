@@ -6,6 +6,7 @@ import { fallbackGameImage } from './gameAssets'
 import { useTheme } from './ThemeContext'
 import logoNavLight from '@/imports/logo-nav-light.png'
 import logoNavDark from '@/imports/logo-nav-dark.png'
+import Seo from './Seo'
 
 export default function GameDetailPage() {
   const { gameId } = useParams()
@@ -21,6 +22,12 @@ export default function GameDetailPage() {
   if (loading && !game) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center">
+        <Seo
+          title="Loading Game | Joe Yoke"
+          description="Loading this Joe Yoke game guide."
+          path={`/games/${encodeURIComponent(gameId || '')}`}
+          noIndex
+        />
         <div className="w-8 h-8 rounded-full border-2 border-white/15 border-t-[#C5FF00] animate-spin" />
       </div>
     )
@@ -29,6 +36,12 @@ export default function GameDetailPage() {
   if (!game) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col items-center justify-center gap-5 px-6 text-center">
+        <Seo
+          title="Game Not Found | Joe Yoke"
+          description="The requested Joe Yoke game could not be found."
+          path={`/games/${encodeURIComponent(gameId || '')}`}
+          noIndex
+        />
         <p className="text-[#C5FF00] text-xs font-bold tracking-widest uppercase">Game not found</p>
         <h1 className="text-4xl font-black tracking-tight">This game is not available.</h1>
         <button onClick={() => navigate('/games')} className="px-5 py-3 rounded-full bg-[#C5FF00] text-black font-bold">
@@ -43,6 +56,13 @@ export default function GameDetailPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A] text-white' : 'bg-[#F8F9FA] text-[#1A1A1A]'}`}>
+      <Seo
+        title={`How to Play ${game.title} | Joe Yoke`}
+        description={game.description}
+        path={`/games/${encodeURIComponent(game.id)}`}
+        image={banner}
+        type="article"
+      />
       <header className={`sticky top-0 z-50 backdrop-blur-md border-b ${darkMode ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-black/10'}`}>
         <div className="max-w-7xl mx-auto h-16 px-5 md:px-12 flex items-center gap-4">
           <button onClick={() => navigate('/games')} className={`flex items-center gap-2 text-sm font-semibold ${darkMode ? 'text-white/55 hover:text-white' : 'text-black/55 hover:text-black'}`}>
