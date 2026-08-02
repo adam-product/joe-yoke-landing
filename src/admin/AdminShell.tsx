@@ -66,6 +66,9 @@ export default function AdminShell() {
                 <NavLink to="/content/games" className={subNavLinkClass}>
                   <Gamepad2 className="w-4 h-4" /> Trending Games
                 </NavLink>
+                <NavLink to="/content/playNow" className={subNavLinkClass}>
+                  <ExternalLink className="w-4 h-4" /> Play Now Button
+                </NavLink>
                 <NavLink to="/content/categories" className={subNavLinkClass}>
                   <Layers className="w-4 h-4" /> Game Categories
                 </NavLink>

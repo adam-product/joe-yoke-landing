@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Search, Sun, Moon, Gamepad2 } from 'lucide-react'
 import { useGames, badgeColor, type GameEntry } from './admin/GamesContext'
+import { useContent } from './admin/ContentContext'
 import { useTheme } from './ThemeContext'
 import logoNavLight from '@/imports/logo-nav-light.png'
 import logoNavDark from '@/imports/logo-nav-dark.png'
@@ -33,6 +34,30 @@ const LIME_LIGHT_TEXT = '#5C7A00'
 
 const BADGE_OPTIONS = ['All', 'STRATEGY', 'CUE SPORTS', 'BOARD', 'PARTY', 'ACTION', 'PUZZLE', 'SPORTS', 'TRIVIA']
 
+function plainText(value: unknown, fallback: string): string {
+  const text = String(value ?? '').replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim()
+  return text || fallback
+}
+
+function normalizePlayNowDestination(value: unknown): string {
+  const destination = plainText(value, '/download')
+
+  if (destination.startsWith('/') && !destination.startsWith('//')) {
+    return destination
+  }
+
+  try {
+    const url = new URL(destination)
+    if (url.protocol === 'https:' || url.protocol === 'http:') {
+      return url.toString()
+    }
+  } catch {
+    // Invalid or unsafe destinations fall back to the local download page.
+  }
+
+  return '/download'
+}
+
 // Same magnetic-pull micro-interaction used elsewhere on the site, so buttons
 // feel consistent between the landing page and this one.
 function Magnetic({ children, strength = 0.25 }: { children: React.ReactNode; strength?: number }) {
@@ -56,7 +81,7 @@ function Magnetic({ children, strength = 0.25 }: { children: React.ReactNode; st
   )
 }
 
-function GameCard({ game, dark, size = 'normal' }: { game: GameEntry; dark: boolean; size?: 'normal' | 'spotlight' }) {
+function GameCard({ game, dark, playNowLabel, onPlayNow, size = 'normal' }: { game: GameEntry; dark: boolean; playNowLabel: string; onPlayNow: () => void; size?: 'normal' | 'spotlight' }) {
   const accent = badgeColor(game.badge)
   const img = game.imageUrl || fallbackImageFor(game)
   const spotlight = size === 'spotlight'
@@ -101,10 +126,12 @@ function GameCard({ game, dark, size = 'normal' }: { game: GameEntry; dark: bool
           <p className={`relative text-white/50 leading-relaxed ${spotlight ? 'text-sm md:text-base max-w-md mb-4' : 'text-xs line-clamp-2 mb-0'}`}>{game.description}</p>
           <Magnetic strength={spotlight ? 0.15 : 0.1}>
             <button
+              type="button"
+              onClick={onPlayNow}
               className={`relative flex items-center justify-center gap-2 rounded-xl font-bold transition-all ${spotlight ? 'mt-1 px-6 py-2.5 text-sm w-fit' : 'mt-3 w-full px-4 py-2.5 text-xs'}`}
               style={{ background: `${accent}1c`, color: accent, border: `1px solid ${accent}40` }}
             >
-              <span>Play Now</span> <ArrowUpRight className={spotlight ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
+              <span>{playNowLabel}</span> <ArrowUpRight className={spotlight ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
             </button>
           </Magnetic>
         </div>
@@ -116,9 +143,21 @@ function GameCard({ game, dark, size = 'normal' }: { game: GameEntry; dark: bool
 export default function AllGames() {
   const navigate = useNavigate()
   const { games } = useGames()
+  const { get } = useContent()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('All')
   const { darkMode, toggleDarkMode } = useTheme()
+  const playNowLabel = plainText(get('playNow', 'label'), 'Play Now')
+  const playNowDestination = normalizePlayNowDestination(get('playNow', 'destination'))
+
+  const handlePlayNow = () => {
+    if (playNowDestination.startsWith('/')) {
+      navigate(playNowDestination)
+      return
+    }
+
+    window.location.assign(playNowDestination)
+  }
 
   const filtered = games.filter(g => {
     const matchBadge = filter === 'All' || g.badge === filter
@@ -283,7 +322,7 @@ export default function AllGames() {
                 transition={{ duration: 0.6, ease }}
                 className="mb-6"
               >
-                <GameCard game={spotlightGame} dark={darkMode} size="spotlight" />
+                <GameCard game={spotlightGame} dark={darkMode} playNowLabel={playNowLabel} onPlayNow={handlePlayNow} size="spotlight" />
               </motion.div>
             )}
 
@@ -296,7 +335,7 @@ export default function AllGames() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.5, ease, delay: i * 0.05 }}
                   >
-                    <GameCard game={game} dark={darkMode} />
+                    <GameCard game={game} dark={darkMode} playNowLabel={playNowLabel} onPlayNow={handlePlayNow} />
                   </motion.div>
                 ))}
               </div>

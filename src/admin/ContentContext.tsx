@@ -20,6 +20,10 @@ const DEFAULT_CONTENT: Record<string, any> = {
   games: {
     sectionTitle: "Trending Games"
   },
+  playNow: {
+    label: "Play Now",
+    destination: "/download"
+  },
   categories: {
     subhead: "Browse by",
     headline: "Game Categories",

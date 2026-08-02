@@ -28,6 +28,13 @@ const SECTIONS: Record<string, any> = {
     title: 'Trending Games', desc: 'Games section headers.',
     fields: [{ key: 'sectionTitle', label: 'Section Title' }]
   },
+  playNow: {
+    title: 'Play Now Button', desc: 'Configure the button shown on every game card.',
+    fields: [
+      { key: 'label', label: 'Button Text', type: 'text' },
+      { key: 'destination', label: 'Destination Path or URL', type: 'text' },
+    ]
+  },
   categories: {
     title: 'Game Categories', desc: 'Browse by category labels and tags.',
     fields: [

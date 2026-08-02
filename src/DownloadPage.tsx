@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download as DownloadIcon } from 'lucide-react';
 import { useContent } from './admin/ContentContext';
 import { trackEvent } from './App';
-import faviconImg from '@/imports/favicon.ico-1.jpg';
+import logoNavDark from '@/imports/logo-nav-dark.png';
 // Updated to .png below!
 import appleStoreIcon from '@/imports/Apple App Store icon.png';
 import googlePlayIcon from '@/imports/Google Play Store icon.png';
@@ -62,7 +62,7 @@ export default function DownloadPage() {
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
         <div className="flex items-center gap-2">
-          <img src={faviconImg} alt="Joe Yoke" className="w-8 h-8 rounded-lg object-cover" />
+          <img src={logoNavDark} alt="Joe Yoke" className="w-8 h-8 rounded-lg object-cover" />
           <span className="font-black text-sm tracking-tighter uppercase">Joe Yoke</span>
         </div>
         <div className="w-16" /> 
