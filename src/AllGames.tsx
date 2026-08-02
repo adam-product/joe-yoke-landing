@@ -9,6 +9,7 @@ import { fallbackGameImage } from './gameAssets'
 import logoNavLight from '@/imports/logo-nav-light.png'
 import logoNavDark from '@/imports/logo-nav-dark.png'
 import Seo from './Seo'
+import StructuredData from './StructuredData'
 
 // Images are matched to games by creation order (id 1 → first image, id 2 → second, …),
 // mirroring exactly how the homepage's Trending Games section maps them. Using
@@ -172,6 +173,16 @@ export default function AllGames() {
         title="Multiplayer Games to Play With Friends | Joe Yoke"
         description="Explore Joe Yoke multiplayer games, learn how each game works, and find your next favorite game to play with friends."
         path="/games"
+      />
+      <StructuredData
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://joeyoke.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Games', item: 'https://joeyoke.com/games' },
+          ],
+        }}
       />
       {/* Ambient background glow, matches the brand's lime/dark aesthetic */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden -z-0" aria-hidden>

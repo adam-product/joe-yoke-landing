@@ -7,6 +7,7 @@ import { useTheme } from './ThemeContext'
 import logoNavLight from '@/imports/logo-nav-light.png'
 import logoNavDark from '@/imports/logo-nav-dark.png'
 import Seo from './Seo'
+import StructuredData from './StructuredData'
 
 export default function GameDetailPage() {
   const { gameId } = useParams()
@@ -53,6 +54,10 @@ export default function GameDetailPage() {
 
   const accent = badgeColor(game.badge)
   const banner = fallbackGameImage(game)
+  const canonicalUrl = `https://joeyoke.com/games/${encodeURIComponent(game.id)}`
+  const structuredImage = banner.startsWith('data:')
+    ? 'https://joeyoke.com/favicon.png'
+    : new URL(banner, 'https://joeyoke.com/').toString()
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A] text-white' : 'bg-[#F8F9FA] text-[#1A1A1A]'}`}>
@@ -62,6 +67,29 @@ export default function GameDetailPage() {
         path={`/games/${encodeURIComponent(game.id)}`}
         image={banner}
         type="article"
+      />
+      <StructuredData
+        data={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://joeyoke.com/' },
+              { '@type': 'ListItem', position: 2, name: 'Games', item: 'https://joeyoke.com/games' },
+              { '@type': 'ListItem', position: 3, name: game.title, item: canonicalUrl },
+            ],
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'VideoGame',
+            name: game.title,
+            description: game.description,
+            image: structuredImage,
+            url: canonicalUrl,
+            genre: game.badge,
+            gamePlatform: ['iOS', 'Android'],
+          },
+        ]}
       />
       <header className={`sticky top-0 z-50 backdrop-blur-md border-b ${darkMode ? 'bg-[#0A0A0A]/90 border-white/10' : 'bg-white/90 border-black/10'}`}>
         <div className="max-w-7xl mx-auto h-16 px-5 md:px-12 flex items-center gap-4">

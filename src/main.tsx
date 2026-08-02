@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { createHead, UnheadProvider } from '@unhead/react/client'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import App from './App.tsx'
 import DownloadPage from './DownloadPage.tsx'
 import AllGames from './AllGames.tsx'
@@ -99,6 +101,8 @@ createRoot(document.getElementById('root')!).render(
           <ContentProvider>
             <GamesProvider>
               <RouterProvider router={router} />
+              {!isAdminHostname && <Analytics />}
+              {!isAdminHostname && <SpeedInsights />}
             </GamesProvider>
           </ContentProvider>
         </AuthProvider>

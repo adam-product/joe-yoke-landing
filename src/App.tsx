@@ -16,6 +16,7 @@ import { useContent } from './admin/ContentContext'
 import { useTheme } from './ThemeContext'
 import { fallbackGameImage } from './gameAssets'
 import Seo from './Seo'
+import StructuredData from './StructuredData'
 
 const supabaseUrl = `https://${projectId}.supabase.co`;
 const supabase = createClient(supabaseUrl, publicAnonKey);
@@ -684,6 +685,24 @@ export default function App() {
         title="Joe Yoke – Multiplayer Games and Gaming Community"
         description="Play multiplayer games, discover new favorites, connect with friends, and join the Joe Yoke gaming community."
         path="/"
+      />
+      <StructuredData
+        data={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Joe Yoke',
+            url: 'https://joeyoke.com/',
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Joe Yoke',
+            url: 'https://joeyoke.com/',
+            logo: 'https://joeyoke.com/favicon.png',
+            description: 'A multiplayer gaming platform and community for playing games with friends.',
+          },
+        ]}
       />
       <Header darkMode={darkMode} setDarkMode={setDarkMode} />
       <LiquidGlassBar dark={darkMode} />

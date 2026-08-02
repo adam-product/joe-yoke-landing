@@ -9,6 +9,7 @@ import logoNavDark from '@/imports/logo-nav-dark.png';
 import appleStoreIcon from '@/imports/Apple App Store icon.png';
 import googlePlayIcon from '@/imports/Google Play Store icon.png';
 import Seo from './Seo';
+import StructuredData from './StructuredData';
 
 // Helper to strip HTML tags and sanitize URLs
 const cleanText = (str: string) => {
@@ -54,6 +55,16 @@ export default function DownloadPage() {
         title="Download Joe Yoke for iOS and Android"
         description="Download Joe Yoke for iPhone or Android and start playing multiplayer games with your friends."
         path="/download"
+      />
+      <StructuredData
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://joeyoke.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Download', item: 'https://joeyoke.com/download' },
+          ],
+        }}
       />
       
       {/* Background Glow */}
