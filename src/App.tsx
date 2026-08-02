@@ -32,7 +32,7 @@ export const trackEvent = async (eventName: string) => {
   }]);
 };
 
-interface Game { badge: string; title: string; description: string; id: number; image: string; }
+interface Game { badge: string; title: string; description: string; id: string | number; image: string; }
 interface Category { index: string; title: string; tags: string; }
 
 const NAV_LINKS = ['GAMES', 'COMMUNITY', 'DOWNLOAD APP']
@@ -52,6 +52,28 @@ const FOOTER_LINKS = [
 ]
 
 const ease = [0.16, 1, 0.3, 1] as const
+
+function safeExternalUrl(value: unknown): string {
+  const raw = String(value ?? '').replace(/<[^>]*>?/gm, '').trim()
+  if (!raw) return ''
+
+  try {
+    const url = new URL(raw)
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : ''
+  } catch {
+    return ''
+  }
+}
+
+function DiscordIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
+      <path d="M7.2 6.2A14.5 14.5 0 0 1 10 5.4l.35.7a11.7 11.7 0 0 1 3.3 0l.35-.7a14.5 14.5 0 0 1 2.8.8c2 2.8 2.55 5.5 2.3 8.15a11.4 11.4 0 0 1-3.45 1.75l-.85-1.15c.55-.2 1.1-.47 1.6-.8a8.3 8.3 0 0 1-8.8 0c.5.33 1.05.6 1.6.8l-.85 1.15a11.4 11.4 0 0 1-3.45-1.75C4.65 11.7 5.2 9 7.2 6.2Z" fill="currentColor" />
+      <circle cx="9.4" cy="11.3" r="1.05" fill="#1A1A1A" />
+      <circle cx="14.6" cy="11.3" r="1.05" fill="#1A1A1A" />
+    </svg>
+  )
+}
 
 function FadeUp({ children, delay = 0, className, dark }: { children: ReactNode; delay?: number; className?: string; dark?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -309,6 +331,8 @@ const CARD_ACCENTS = ['#60a5fa', '#34d399', '#fb923c', '#f87171', '#a78bfa', '#f
 
 function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boolean; index: number }) {
   const accent = CARD_ACCENTS[index % CARD_ACCENTS.length]
+  const navigate = useNavigate()
+  const openDetails = () => navigate(`/games/${game.id}`)
   return (
     <FadeUp delay={delay}>
       <div className="rounded-[24px] md:rounded-[28px] p-[3px] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl" style={{ background: `linear-gradient(135deg, ${accent}30 0%, transparent 60%)`, boxShadow: `0 0 0 1px ${accent}22, 0 24px 48px ${accent}15` }}>
@@ -317,7 +341,7 @@ function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boo
           <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, ${accent} 0%, transparent 70%)` }} />
           <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-10">
             <span className="px-3 py-1 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase backdrop-blur-sm" style={{ background: `${accent}25`, color: accent, border: `1px solid ${accent}40` }}>{game.badge}</span>
-            <button className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-all group/btn">
+            <button onClick={openDetails} aria-label={`View ${game.title} details`} className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-all group/btn">
               <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
             </button>
           </div>
@@ -331,9 +355,9 @@ function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boo
             }} />
             <h3 className="relative z-10 text-white text-lg md:text-xl font-black tracking-tight leading-tight">{game.title}</h3>
             <p className="relative z-10 text-white/75 text-xs md:text-sm leading-relaxed line-clamp-2 md:line-clamp-none">{game.description}</p>
-            <a href="#" className="relative z-10 group/link inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold tracking-wide hover:gap-3 transition-all duration-200 mt-1" style={{ color: accent }}>
+            <button onClick={openDetails} className="relative z-10 group/link inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold tracking-wide hover:gap-3 transition-all duration-200 mt-1 w-fit" style={{ color: accent }}>
               VIEW DETAILS <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -347,7 +371,7 @@ function TrendingGames({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const featured = games.filter(g => g.featured).slice(0, 4)
   const displayGames: Game[] = featured.length > 0
-    ? featured.map((g, i) => ({ id: Number(g.id) || i + 1, badge: g.badge, title: g.title, description: g.description, image: g.imageUrl || [gameImg1, gameImg2, gameImg3, gameImg4][i] || gameImg1 }))
+    ? featured.map((g, i) => ({ id: g.id, badge: g.badge, title: g.title, description: g.description, image: g.imageUrl || [gameImg1, gameImg2, gameImg3, gameImg4][i] || gameImg1 }))
     : GAMES
 
   return (
@@ -436,6 +460,12 @@ function Categories({ dark }: { dark: boolean }) {
 function CommunityStats({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const stats = [1, 2, 3, 4].map(n => ({ value: get('stats', `stat${n}_value`), label: get('stats', `stat${n}_label`) }))
+  const discordUrl = safeExternalUrl(get('stats', 'discordUrl'))
+
+  const joinDiscord = () => {
+    trackEvent('join_discord_click')
+    if (discordUrl) window.open(discordUrl, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <section id="community" className={`py-16 md:py-20 px-4 sm:px-6 md:px-12 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
@@ -449,9 +479,10 @@ function CommunityStats({ dark }: { dark: boolean }) {
               </div>
               <Magnetic>
                 <button 
-                  onClick={() => trackEvent('join_discord_click')}
+                  onClick={joinDiscord}
                   className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
                 >
+                  <DiscordIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
                   <span dangerouslySetInnerHTML={renderHTML(get('stats', 'ctaLabel'))} className="[&_p]:m-0" />
                   <span className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300 shrink-0">
                     <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-[#C5FF00]" />

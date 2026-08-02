@@ -5,26 +5,14 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, Search, Sun, Moon, Gamepad2 } from
 import { useGames, badgeColor, type GameEntry } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
 import { useTheme } from './ThemeContext'
+import { fallbackGameImage } from './gameAssets'
 import logoNavLight from '@/imports/logo-nav-light.png'
 import logoNavDark from '@/imports/logo-nav-dark.png'
-import gameImg1 from '@/imports/photo_2026-07-23_20-54-30.jpg'
-import gameImg2 from '@/imports/photo_2026-07-23_20-54-27.jpg'
-import gameImg3 from '@/imports/photo_2026-07-23_20-54-21.jpg'
-import gameImg4 from '@/imports/photo_2026-07-23_20-54-19.jpg'
 
 // Images are matched to games by creation order (id 1 → first image, id 2 → second, …),
 // mirroring exactly how the homepage's Trending Games section maps them. Using
 // `Number(id) % length` (the old logic) shifts everything by one slot once ids
 // start at 1 instead of 0 — that was the source of the mismatched photos.
-const FALLBACK_IMAGES = [gameImg1, gameImg2, gameImg3, gameImg4]
-
-function fallbackImageFor(game: GameEntry): string {
-  const idNum = Number(game.id)
-  if (!Number.isFinite(idNum) || FALLBACK_IMAGES.length === 0) return gameImg1
-  const index = ((idNum - 1) % FALLBACK_IMAGES.length + FALLBACK_IMAGES.length) % FALLBACK_IMAGES.length
-  return FALLBACK_IMAGES[index] ?? gameImg1
-}
-
 const ease = [0.16, 1, 0.3, 1] as const
 
 // Raw brand lime (#C5FF00) reads great on the dark theme but is nearly
@@ -83,7 +71,7 @@ function Magnetic({ children, strength = 0.25 }: { children: React.ReactNode; st
 
 function GameCard({ game, dark, playNowLabel, onPlayNow, size = 'normal' }: { game: GameEntry; dark: boolean; playNowLabel: string; onPlayNow: () => void; size?: 'normal' | 'spotlight' }) {
   const accent = badgeColor(game.badge)
-  const img = game.imageUrl || fallbackImageFor(game)
+  const img = fallbackGameImage(game)
   const spotlight = size === 'spotlight'
   void dark
 

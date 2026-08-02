@@ -37,6 +37,7 @@ const DEFAULT_CONTENT: Record<string, any> = {
   stats: {
     headline: "Built for gamers,\nby gamers.",
     ctaLabel: "Join Discord",
+    discordUrl: "https://discord.com",
     stat1_value: "2M+", stat1_label: "Active Players",
     stat2_value: "50+", stat2_label: "Party Games",
     stat3_value: "100k", stat3_label: "Communities",

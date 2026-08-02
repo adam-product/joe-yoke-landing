@@ -47,6 +47,7 @@ const SECTIONS: Record<string, any> = {
     fields: [
       { key: 'headline', label: 'Headline' },
       { key: 'ctaLabel', label: 'CTA Label', type: 'text' },
+      { key: 'discordUrl', label: 'Discord Invite URL', type: 'text' },
       { key: 'stat1_value', label: 'Stat 1 Value', type: 'text' }, { key: 'stat1_label', label: 'Stat 1 Label', type: 'text' },
       { key: 'stat2_value', label: 'Stat 2 Value', type: 'text' }, { key: 'stat2_label', label: 'Stat 2 Label', type: 'text' },
       { key: 'stat3_value', label: 'Stat 3 Value', type: 'text' }, { key: 'stat3_label', label: 'Stat 3 Label', type: 'text' },
