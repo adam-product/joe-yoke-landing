@@ -19,6 +19,8 @@ export interface GameEntry {
   description: string
   imageUrl: string
   featured: boolean
+  showInTrending: boolean
+  showDetails: boolean
   howToPlay: GameGuideStep[]
 }
 
@@ -48,7 +50,7 @@ const guide = (gameId: string, steps: Array<[string, string]>): GameGuideStep[] 
 
 const DEFAULT_GAMES: GameEntry[] = [
   {
-    id: '1', badge: 'STRATEGY', title: 'Chess', featured: true, imageUrl: '',
+    id: '1', badge: 'STRATEGY', title: 'Chess', featured: true, showInTrending: true, showDetails: true, imageUrl: '',
     description: 'Plan every move. Outthink your opponent across the most iconic strategy game ever made.',
     howToPlay: guide('1', [
       ['Set up the board', 'Place the pieces in their starting positions with the queen on her matching color. White always moves first.'],
@@ -57,7 +59,7 @@ const DEFAULT_GAMES: GameEntry[] = [
     ]),
   },
   {
-    id: '2', badge: 'CUE SPORTS', title: 'Snooker', featured: true, imageUrl: '',
+    id: '2', badge: 'CUE SPORTS', title: 'Snooker', featured: true, showInTrending: true, showDetails: true, imageUrl: '',
     description: 'Precision, patience, and power. Pot balls and dominate the table against friends worldwide.',
     howToPlay: guide('2', [
       ['Break from the D', 'Start with the cue ball inside the D and strike a red ball to open the frame.'],
@@ -66,7 +68,7 @@ const DEFAULT_GAMES: GameEntry[] = [
     ]),
   },
   {
-    id: '3', badge: 'BOARD', title: 'Carrom', featured: true, imageUrl: '',
+    id: '3', badge: 'BOARD', title: 'Carrom', featured: true, showInTrending: true, showDetails: true, imageUrl: '',
     description: 'Flick, aim, and pocket. The classic board game reimagined for fast online multiplayer.',
     howToPlay: guide('3', [
       ['Place the striker', 'Position the striker on your baseline without crossing the diagonal arrows.'],
@@ -75,7 +77,7 @@ const DEFAULT_GAMES: GameEntry[] = [
     ]),
   },
   {
-    id: '4', badge: 'PARTY', title: "Liar's Dice", featured: true, imageUrl: '',
+    id: '4', badge: 'PARTY', title: "Liar's Dice", featured: true, showInTrending: true, showDetails: true, imageUrl: '',
     description: 'Bluff your way to victory. Roll, bet, and deceive — the last one with dice standing wins.',
     howToPlay: guide('4', [
       ['Roll in secret', 'Every player rolls their dice and keeps the result hidden from the other players.'],
@@ -97,6 +99,8 @@ function normalizeGame(value: Partial<GameEntry>, index: number): GameEntry {
     description: String(value.description ?? defaultGame?.description ?? ''),
     imageUrl: String(value.imageUrl ?? ''),
     featured: value.featured ?? defaultGame?.featured ?? false,
+    showInTrending: value.showInTrending ?? defaultGame?.showInTrending ?? true,
+    showDetails: value.showDetails ?? defaultGame?.showDetails ?? true,
     howToPlay: steps.map((step, stepIndex) => ({
       id: String(step.id ?? `${id}-step-${stepIndex + 1}`),
       title: String(step.title ?? `Step ${stepIndex + 1}`),

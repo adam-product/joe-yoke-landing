@@ -33,17 +33,17 @@ export const trackEvent = async (eventName: string) => {
   }]);
 };
 
-interface Game { badge: string; title: string; description: string; id: string | number; image: string; }
+interface Game { badge: string; title: string; description: string; id: string | number; image: string; showDetails: boolean; }
 interface Category { index: string; title: string; tags: string; }
 
 const NAV_LINKS = ['GAMES', 'COMMUNITY', 'DOWNLOAD APP']
 const NAV_TARGETS = ['games', 'community', 'download']
 
 const GAMES: Game[] = [
-  { id: 1, badge: 'STRATEGY', title: 'Chess', description: 'Plan every move. Outthink your opponent across the most iconic strategy game ever made.', image: gameImg1 },
-  { id: 2, badge: 'CUE SPORTS', title: 'Snooker', description: 'Precision, patience, and power. Pot balls and dominate the table against friends worldwide.', image: gameImg2 },
-  { id: 3, badge: 'BOARD', title: 'Carrom', description: 'Flick, aim, and pocket. The classic board game reimagined for fast online multiplayer.', image: gameImg3 },
-  { id: 4, badge: 'PARTY', title: "Liar's Dice", description: 'Bluff your way to victory. Roll, bet, and deceive — the last one with dice standing wins.', image: gameImg4 },
+  { id: 1, badge: 'STRATEGY', title: 'Chess', description: 'Plan every move. Outthink your opponent across the most iconic strategy game ever made.', image: gameImg1, showDetails: true },
+  { id: 2, badge: 'CUE SPORTS', title: 'Snooker', description: 'Precision, patience, and power. Pot balls and dominate the table against friends worldwide.', image: gameImg2, showDetails: true },
+  { id: 3, badge: 'BOARD', title: 'Carrom', description: 'Flick, aim, and pocket. The classic board game reimagined for fast online multiplayer.', image: gameImg3, showDetails: true },
+  { id: 4, badge: 'PARTY', title: "Liar's Dice", description: 'Bluff your way to victory. Roll, bet, and deceive — the last one with dice standing wins.', image: gameImg4, showDetails: true },
 ]
 
 const FOOTER_LINKS = [
@@ -342,9 +342,11 @@ function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boo
           <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, ${accent} 0%, transparent 70%)` }} />
           <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-10">
             <span className="px-3 py-1 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase backdrop-blur-sm" style={{ background: `${accent}25`, color: accent, border: `1px solid ${accent}40` }}>{game.badge}</span>
-            <button onClick={openDetails} aria-label={`View ${game.title} details`} className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-all group/btn">
-              <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-            </button>
+            {game.showDetails && (
+              <button onClick={openDetails} aria-label={`View ${game.title} details`} className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-all group/btn">
+                <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+              </button>
+            )}
           </div>
           <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-1 md:gap-2 px-4 md:px-5 pb-4 md:pb-5 pt-16">
             <div className="absolute inset-0 z-0 pointer-events-none" style={{
@@ -356,9 +358,11 @@ function GameCard({ game, delay, index }: { game: Game; delay: number; dark: boo
             }} />
             <h3 className="relative z-10 text-white text-lg md:text-xl font-black tracking-tight leading-tight">{game.title}</h3>
             <p className="relative z-10 text-white/75 text-xs md:text-sm leading-relaxed line-clamp-2 md:line-clamp-none">{game.description}</p>
-            <button onClick={openDetails} className="relative z-10 group/link inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold tracking-wide hover:gap-3 transition-all duration-200 mt-1 w-fit" style={{ color: accent }}>
-              VIEW DETAILS <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
-            </button>
+            {game.showDetails && (
+              <button onClick={openDetails} className="relative z-10 group/link inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold tracking-wide hover:gap-3 transition-all duration-200 mt-1 w-fit" style={{ color: accent }}>
+                VIEW DETAILS <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -370,9 +374,9 @@ function TrendingGames({ dark }: { dark: boolean }) {
   const navigate = useNavigate()
   const { games } = useGames()
   const { get } = useContent()
-  const featured = games.filter(g => g.featured)
+  const featured = games.filter(g => g.featured && g.showInTrending)
   const displayGames: Game[] = featured.length > 0
-    ? featured.map(g => ({ id: g.id, badge: g.badge, title: g.title, description: g.description, image: fallbackGameImage(g) }))
+    ? featured.map(g => ({ id: g.id, badge: g.badge, title: g.title, description: g.description, image: fallbackGameImage(g), showDetails: g.showDetails }))
     : GAMES
 
   return (

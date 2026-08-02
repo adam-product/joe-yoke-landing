@@ -4,13 +4,15 @@ import { ArrowUpRight, CheckCircle, ImagePlus, Plus, Save, Trash2, X } from 'luc
 import { fallbackGameImage } from '../gameAssets'
 import { useGames, type GameEntry } from './GamesContext'
 
-type GameDraft = Pick<GameEntry, 'title' | 'badge' | 'description' | 'imageUrl'>
+type GameDraft = Pick<GameEntry, 'title' | 'badge' | 'description' | 'imageUrl' | 'showInTrending' | 'showDetails'>
 
 const EMPTY_GAME: GameDraft = {
   title: '',
   badge: 'GAME',
   description: '',
   imageUrl: '',
+  showInTrending: true,
+  showDetails: true,
 }
 
 function toDraft(game?: GameEntry): GameDraft {
@@ -19,6 +21,8 @@ function toDraft(game?: GameEntry): GameDraft {
     badge: game.badge,
     description: game.description,
     imageUrl: game.imageUrl,
+    showInTrending: game.showInTrending,
+    showDetails: game.showDetails,
   } : { ...EMPTY_GAME }
 }
 
@@ -155,6 +159,28 @@ function GameEditor({ game, onSave, onCancel, onRemove, onOpenDetails }: GameEdi
           <label className="flex flex-col gap-2">
             <span className="text-xs font-bold uppercase tracking-widest text-white/40">Banner image URL</span>
             <input value={draft.imageUrl} onChange={event => setField('imageUrl', event.target.value)} placeholder="https://..." className="rounded-xl border border-white/10 bg-[#1A1A1A] px-4 py-3 text-white focus:border-[#C5FF00] focus:outline-none" />
+          </label>
+          <label className="flex cursor-pointer items-center justify-between gap-5 rounded-xl border border-white/10 bg-[#1A1A1A] px-4 py-3">
+            <span>
+              <span className="block text-sm font-bold text-white">Show game card in Trending section</span>
+              <span className="mt-0.5 block text-xs text-white/40">Hide the complete card from the homepage without deleting this game.</span>
+            </span>
+            <span className="relative shrink-0">
+              <input type="checkbox" checked={draft.showInTrending} onChange={event => setField('showInTrending', event.target.checked)} className="peer sr-only" />
+              <span className="block h-6 w-11 rounded-full bg-white/15 transition-colors peer-checked:bg-[#C5FF00] peer-focus-visible:ring-2 peer-focus-visible:ring-[#C5FF00]/60 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#1A1A1A]" />
+              <span className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform peer-checked:translate-x-5 peer-checked:bg-black" />
+            </span>
+          </label>
+          <label className="flex cursor-pointer items-center justify-between gap-5 rounded-xl border border-white/10 bg-[#1A1A1A] px-4 py-3">
+            <span>
+              <span className="block text-sm font-bold text-white">Show View Details button</span>
+              <span className="mt-0.5 block text-xs text-white/40">Controls access to this game’s details from its Trending card.</span>
+            </span>
+            <span className="relative shrink-0">
+              <input type="checkbox" checked={draft.showDetails} onChange={event => setField('showDetails', event.target.checked)} className="peer sr-only" />
+              <span className="block h-6 w-11 rounded-full bg-white/15 transition-colors peer-checked:bg-[#C5FF00] peer-focus-visible:ring-2 peer-focus-visible:ring-[#C5FF00]/60 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#1A1A1A]" />
+              <span className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform peer-checked:translate-x-5 peer-checked:bg-black" />
+            </span>
           </label>
         </div>
       </div>

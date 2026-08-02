@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, ArrowUpRight, Search, Sun, Moon, Gamepad2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUpRight, Search, Sun, Moon, Gamepad2, Flame } from 'lucide-react'
 import { useGames, badgeColor, type GameEntry } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
 import { useTheme } from './ThemeContext'
@@ -99,8 +99,8 @@ function GameCard({ game, dark, playNowLabel, onPlayNow, size = 'normal' }: { ga
             {game.badge}
           </span>
           {game.featured && (
-            <span className={`px-2 py-0.5 rounded-full bg-[#C5FF00]/20 text-[#C5FF00] font-bold tracking-wide border border-[#C5FF00]/30 backdrop-blur-sm ${spotlight ? 'text-xs' : 'text-[10px]'}`}>
-              ★ TRENDING
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#C5FF00]/20 text-[#C5FF00] font-bold tracking-wide border border-[#C5FF00]/30 backdrop-blur-sm ${spotlight ? 'text-xs' : 'text-[10px]'}`}>
+              <Flame className={spotlight ? 'w-3.5 h-3.5' : 'w-3 h-3'} aria-hidden /> TRENDING
             </span>
           )}
         </div>
