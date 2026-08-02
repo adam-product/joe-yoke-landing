@@ -8,6 +8,7 @@ import App from './App.tsx'
 import DownloadPage from './DownloadPage.tsx'
 import AllGames from './AllGames.tsx'
 import GameDetailPage from './GameDetailPage.tsx'
+import { PrivacyPolicyPage, TermsPage } from './LegalPages.tsx'
 import Login from './admin/Login.tsx'
 import AdminShell from './admin/AdminShell.tsx'
 import Dashboard from './admin/Dashboard.tsx'
@@ -39,6 +40,14 @@ const publicRoutes = [
   {
     path: "/games/:gameId",
     element: <GameDetailPage />,
+  },
+  {
+    path: "/privacy-policy",
+    element: <PrivacyPolicyPage />,
+  },
+  {
+    path: "/terms",
+    element: <TermsPage />,
   }
 ]
 

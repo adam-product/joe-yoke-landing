@@ -2,10 +2,10 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
     <url>
         <loc>
-            https://joeyoke.com/
+            https://www.joeyoke.com/
         </loc>
         <lastmod>
-            2026-08-02T21:13:14.024Z
+            2026-08-02T21:28:58.489Z
         </lastmod>
         <changefreq>
             weekly
@@ -16,10 +16,10 @@
     </url>
     <url>
         <loc>
-            https://joeyoke.com/games
+            https://www.joeyoke.com/games
         </loc>
         <lastmod>
-            2026-08-02T21:13:14.024Z
+            2026-08-02T21:28:58.489Z
         </lastmod>
         <changefreq>
             weekly
@@ -30,10 +30,10 @@
     </url>
     <url>
         <loc>
-            https://joeyoke.com/download
+            https://www.joeyoke.com/download
         </loc>
         <lastmod>
-            2026-08-02T21:13:14.024Z
+            2026-08-02T21:28:58.489Z
         </lastmod>
         <changefreq>
             monthly
@@ -44,10 +44,38 @@
     </url>
     <url>
         <loc>
-            https://joeyoke.com/games/1
+            https://www.joeyoke.com/privacy-policy
         </loc>
         <lastmod>
-            2026-08-02T21:13:14.024Z
+            2026-08-02T21:28:58.489Z
+        </lastmod>
+        <changefreq>
+            yearly
+        </changefreq>
+        <priority>
+            0.5
+        </priority>
+    </url>
+    <url>
+        <loc>
+            https://www.joeyoke.com/terms
+        </loc>
+        <lastmod>
+            2026-08-02T21:28:58.489Z
+        </lastmod>
+        <changefreq>
+            yearly
+        </changefreq>
+        <priority>
+            0.5
+        </priority>
+    </url>
+    <url>
+        <loc>
+            https://www.joeyoke.com/games/1
+        </loc>
+        <lastmod>
+            2026-08-02T21:28:58.489Z
         </lastmod>
         <changefreq>
             monthly
@@ -58,10 +86,10 @@
     </url>
     <url>
         <loc>
-            https://joeyoke.com/games/2
+            https://www.joeyoke.com/games/2
         </loc>
         <lastmod>
-            2026-08-02T21:13:14.024Z
+            2026-08-02T21:28:58.489Z
         </lastmod>
         <changefreq>
             monthly
@@ -72,10 +100,10 @@
     </url>
     <url>
         <loc>
-            https://joeyoke.com/games/3
+            https://www.joeyoke.com/games/3
         </loc>
         <lastmod>
-            2026-08-02T21:13:14.024Z
+            2026-08-02T21:28:58.489Z
         </lastmod>
         <changefreq>
             monthly
@@ -86,10 +114,10 @@
     </url>
     <url>
         <loc>
-            https://joeyoke.com/games/4
+            https://www.joeyoke.com/games/4
         </loc>
         <lastmod>
-            2026-08-02T21:13:14.024Z
+            2026-08-02T21:28:58.489Z
         </lastmod>
         <changefreq>
             monthly

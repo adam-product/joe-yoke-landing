@@ -179,8 +179,8 @@ export default function AllGames() {
           '@context': 'https://schema.org',
           '@type': 'BreadcrumbList',
           itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://joeyoke.com/' },
-            { '@type': 'ListItem', position: 2, name: 'Games', item: 'https://joeyoke.com/games' },
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.joeyoke.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Games', item: 'https://www.joeyoke.com/games' },
           ],
         }}
       />

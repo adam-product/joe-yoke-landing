@@ -54,10 +54,10 @@ export default function GameDetailPage() {
 
   const accent = badgeColor(game.badge)
   const banner = fallbackGameImage(game)
-  const canonicalUrl = `https://joeyoke.com/games/${encodeURIComponent(game.id)}`
+  const canonicalUrl = `https://www.joeyoke.com/games/${encodeURIComponent(game.id)}`
   const structuredImage = banner.startsWith('data:')
-    ? 'https://joeyoke.com/favicon.png'
-    : new URL(banner, 'https://joeyoke.com/').toString()
+    ? 'https://www.joeyoke.com/favicon.png'
+    : new URL(banner, 'https://www.joeyoke.com/').toString()
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A] text-white' : 'bg-[#F8F9FA] text-[#1A1A1A]'}`}>
@@ -74,8 +74,8 @@ export default function GameDetailPage() {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://joeyoke.com/' },
-              { '@type': 'ListItem', position: 2, name: 'Games', item: 'https://joeyoke.com/games' },
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.joeyoke.com/' },
+              { '@type': 'ListItem', position: 2, name: 'Games', item: 'https://www.joeyoke.com/games' },
               { '@type': 'ListItem', position: 3, name: game.title, item: canonicalUrl },
             ],
           },

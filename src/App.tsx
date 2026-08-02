@@ -715,14 +715,14 @@ export default function App() {
             '@context': 'https://schema.org',
             '@type': 'WebSite',
             name: 'Joe Yoke',
-            url: 'https://joeyoke.com/',
+            url: 'https://www.joeyoke.com/',
           },
           {
             '@context': 'https://schema.org',
             '@type': 'Organization',
             name: 'Joe Yoke',
-            url: 'https://joeyoke.com/',
-            logo: 'https://joeyoke.com/favicon.png',
+            url: 'https://www.joeyoke.com/',
+            logo: 'https://www.joeyoke.com/favicon.png',
             description: 'A multiplayer gaming platform and community for playing games with friends.',
           },
         ]}

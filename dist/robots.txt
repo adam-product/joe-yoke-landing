@@ -6,4 +6,4 @@ Disallow: /users
 Disallow: /content
 Disallow: /game-details
 
-Sitemap: https://joeyoke.com/sitemap.xml
+Sitemap: https://www.joeyoke.com/sitemap.xml

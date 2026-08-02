@@ -1,6 +1,6 @@
 import { useHead, useSeoMeta } from '@unhead/react'
 
-const SITE_URL = 'https://joeyoke.com'
+const SITE_URL = 'https://www.joeyoke.com'
 const DEFAULT_SHARE_IMAGE = '/favicon.png'
 
 type SeoProps = {

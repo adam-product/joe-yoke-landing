@@ -66,8 +66,8 @@ const DEFAULT_CONTENT: Record<string, any> = {
         links: [
           { id: "help-center", label: "Help Center", url: "#" },
           { id: "contact", label: "Contact Us", url: "#" },
-          { id: "privacy", label: "Privacy Policy", url: "#" },
-          { id: "terms", label: "Terms", url: "#" }
+          { id: "privacy", label: "Privacy Policy", url: "/privacy-policy" },
+          { id: "terms", label: "Terms & Conditions", url: "/terms" }
         ]
       },
       {
@@ -109,6 +109,29 @@ const mergeWithDefaults = (incoming: Record<string, any> | null | undefined) => 
       merged[section] = value;
     }
   });
+
+  // Migrate the original placeholder legal links already saved in Supabase.
+  // Custom URLs entered by an admin are preserved.
+  const columns = merged.footer?.linkColumns;
+  if (Array.isArray(columns)) {
+    merged.footer = {
+      ...merged.footer,
+      linkColumns: columns.map((column: any) => ({
+        ...column,
+        links: Array.isArray(column.links)
+          ? column.links.map((link: any) => {
+              if (link.id === 'privacy' && (!link.url || link.url === '#')) {
+                return { ...link, url: '/privacy-policy' };
+              }
+              if (link.id === 'terms' && (!link.url || link.url === '#')) {
+                return { ...link, label: link.label === 'Terms' ? 'Terms & Conditions' : link.label, url: '/terms' };
+              }
+              return link;
+            })
+          : column.links,
+      })),
+    };
+  }
 
   return merged;
 };

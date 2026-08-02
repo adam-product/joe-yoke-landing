@@ -61,8 +61,8 @@ export default function DownloadPage() {
           '@context': 'https://schema.org',
           '@type': 'BreadcrumbList',
           itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://joeyoke.com/' },
-            { '@type': 'ListItem', position: 2, name: 'Download', item: 'https://joeyoke.com/download' },
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.joeyoke.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Download', item: 'https://www.joeyoke.com/download' },
           ],
         }}
       />
