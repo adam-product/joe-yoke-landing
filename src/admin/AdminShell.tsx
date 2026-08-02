@@ -11,7 +11,7 @@ export default function AdminShell() {
 
   const handleLogout = () => {
     logout();
-    navigate('/admin');
+    navigate('/');
   };
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) => 
@@ -40,7 +40,7 @@ export default function AdminShell() {
         </div>
 
         <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto custom-scrollbar">
-          <NavLink to="/admin/dashboard" className={navLinkClass}>
+          <NavLink to="/dashboard" className={navLinkClass}>
             <LayoutDashboard className="w-5 h-5" /> Dashboard
           </NavLink>
 
@@ -57,38 +57,38 @@ export default function AdminShell() {
             
             {contentOpen && (
               <div className="flex flex-col gap-1 mt-1">
-                <NavLink to="/admin/content/hero" className={subNavLinkClass}>
+                <NavLink to="/content/hero" className={subNavLinkClass}>
                   <LayoutTemplate className="w-4 h-4" /> Hero Section
                 </NavLink>
-                <NavLink to="/admin/content/about" className={subNavLinkClass}>
+                <NavLink to="/content/about" className={subNavLinkClass}>
                   <Type className="w-4 h-4" /> About
                 </NavLink>
-                <NavLink to="/admin/content/games" className={subNavLinkClass}>
+                <NavLink to="/content/games" className={subNavLinkClass}>
                   <Gamepad2 className="w-4 h-4" /> Trending Games
                 </NavLink>
-                <NavLink to="/admin/content/categories" className={subNavLinkClass}>
+                <NavLink to="/content/categories" className={subNavLinkClass}>
                   <Layers className="w-4 h-4" /> Game Categories
                 </NavLink>
-                <NavLink to="/admin/content/stats" className={subNavLinkClass}>
+                <NavLink to="/content/stats" className={subNavLinkClass}>
                   <BarChart2 className="w-4 h-4" /> Community Stats
                 </NavLink>
-                <NavLink to="/admin/content/footer" className={subNavLinkClass}>
+                <NavLink to="/content/footer" className={subNavLinkClass}>
                   <LayoutTemplate className="w-4 h-4 rotate-180" /> Footer
                 </NavLink>
-                <NavLink to="/admin/content/downloads" className={subNavLinkClass}>
+                <NavLink to="/content/downloads" className={subNavLinkClass}>
                   <Download className="w-4 h-4" /> Download Links
                 </NavLink>
               </div>
             )}
           </div>
 
-          <NavLink to="/admin/users" className={navLinkClass}>
+          <NavLink to="/users" className={navLinkClass}>
             <Users className="w-5 h-5" /> Users
           </NavLink>
         </nav>
 
         <div className="p-4 border-t border-white/10 flex flex-col gap-2 mt-auto">
-          <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors mb-2">
+          <a href="https://www.joeyoke.com" target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors mb-2">
             <ExternalLink className="w-5 h-5" /> View Site
           </a>
           

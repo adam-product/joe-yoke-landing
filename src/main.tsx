@@ -15,7 +15,7 @@ import { GamesProvider } from './admin/GamesContext.tsx'
 import { ThemeProvider } from './ThemeContext.tsx'
 import './index.css'
 
-const router = createBrowserRouter([
+const publicRoutes = [
   {
     path: "/",
     element: <App />,
@@ -27,13 +27,16 @@ const router = createBrowserRouter([
   {
     path: "/games",
     element: <AllGames />,
-  },
+  }
+]
+
+const adminRoutes = [
   {
-    path: "/admin",
+    path: "/",
     element: <Login />,
   },
   {
-    path: "/admin",
+    path: "/",
     element: <AdminShell />,
     children: [
       {
@@ -50,7 +53,24 @@ const router = createBrowserRouter([
       }
     ]
   }
+]
+
+const adminHostnames = new Set([
+  'admin.joeyoke.com',
+  'joeyokeadmin.joeyoke.com',
 ])
+
+const hostname = window.location.hostname.toLowerCase()
+const isAdminHostname = adminHostnames.has(hostname)
+const isLegacyAdminPath =
+  window.location.pathname === '/admin' ||
+  window.location.pathname.startsWith('/admin/')
+
+const router = isAdminHostname || isLegacyAdminPath
+  ? createBrowserRouter(adminRoutes, {
+      basename: isAdminHostname ? '/' : '/admin',
+    })
+  : createBrowserRouter(publicRoutes)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
