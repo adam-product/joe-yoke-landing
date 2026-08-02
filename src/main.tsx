@@ -62,14 +62,9 @@ const adminHostnames = new Set([
 
 const hostname = window.location.hostname.toLowerCase()
 const isAdminHostname = adminHostnames.has(hostname)
-const isLegacyAdminPath =
-  window.location.pathname === '/admin' ||
-  window.location.pathname.startsWith('/admin/')
 
-const router = isAdminHostname || isLegacyAdminPath
-  ? createBrowserRouter(adminRoutes, {
-      basename: isAdminHostname ? '/' : '/admin',
-    })
+const router = isAdminHostname
+  ? createBrowserRouter(adminRoutes)
   : createBrowserRouter(publicRoutes)
 
 createRoot(document.getElementById('root')!).render(
