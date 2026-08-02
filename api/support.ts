@@ -1,6 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
-import { projectId, publicAnonKey } from '../utils/supabase/info'
 
 type SupportRole = 'user' | 'assistant' | 'admin'
 type SupportStatus = 'open' | 'needs_attention' | 'resolved'
@@ -26,11 +25,18 @@ type SupportConversation = {
 }
 
 const SUPPORT_PREFIX = 'support_conversation:'
-const supabase = createClient(
-  `https://${projectId}.supabase.co`,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || publicAnonKey,
-  { auth: { persistSession: false, autoRefreshToken: false } },
-)
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xcmknkbxkjhnplnhmwkg.supabase.co'
+let supabase: any = null
+
+function getSupabase() {
+  if (supabase) return supabase
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  if (!serviceRoleKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured in Vercel.')
+  supabase = createClient(SUPABASE_URL, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  })
+  return supabase
+}
 
 const recentRequests = new Map<string, number[]>()
 const now = () => new Date().toISOString()
@@ -46,20 +52,20 @@ const publicConversation = (conversation: SupportConversation) => {
 }
 
 async function kvGet(key: string) {
-  const { data, error } = await supabase.from('kv_store_dd2dc34e').select('value').eq('key', key).maybeSingle()
+  const { data, error } = await getSupabase().from('kv_store_dd2dc34e').select('value').eq('key', key).maybeSingle()
   if (error) throw new Error(error.message)
   return data?.value
 }
 
 async function kvSet(key: string, value: unknown) {
-  const { error } = await supabase.from('kv_store_dd2dc34e').upsert({ key, value })
+  const { error } = await getSupabase().from('kv_store_dd2dc34e').upsert({ key, value })
   if (error) throw new Error(error.message)
 }
 
 async function kvGetByPrefix(prefix: string) {
-  const { data, error } = await supabase.from('kv_store_dd2dc34e').select('value').like('key', `${prefix}%`)
+  const { data, error } = await getSupabase().from('kv_store_dd2dc34e').select('value').like('key', `${prefix}%`)
   if (error) throw new Error(error.message)
-  return data?.map(row => row.value) || []
+  return data?.map((row: { value: unknown }) => row.value) || []
 }
 
 function requireAdmin(request: any) {
@@ -174,11 +180,23 @@ ${JSON.stringify(productKnowledge)}`,
 }
 
 function json(response: any, status: number, body: unknown) {
-  response.status(status).setHeader('Cache-Control', 'no-store').json(body)
+  response.statusCode = status
+  response.setHeader('Cache-Control', 'no-store')
+  response.setHeader('Content-Type', 'application/json; charset=utf-8')
+  response.end(JSON.stringify(body))
 }
 
 export default async function handler(request: any, response: any) {
   try {
+    if (request.method === 'GET' && cleanText(request.query?.health, 10) === '1') {
+      return json(response, 200, {
+        ok: true,
+        service: 'joe-yoke-support',
+        supabaseConfigured: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+        openAiConfigured: Boolean(process.env.OPENAI_API_KEY),
+      })
+    }
+
     const adminAction = cleanText(request.query?.admin, 30)
     const conversationId = cleanText(request.query?.conversationId, 100)
 
