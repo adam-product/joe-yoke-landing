@@ -48,12 +48,6 @@ const GAMES: Game[] = [
   { id: 4, badge: 'PARTY', title: "Liar's Dice", description: 'Bluff your way to victory. Roll, bet, and deceive — the last one with dice standing wins.', image: gameImg4, showDetails: true },
 ]
 
-const FOOTER_LINKS = [
-  { heading: 'Product', links: ['Games', 'Community', 'Leaderboard', 'App Store'] },
-  { heading: 'Support', links: ['Help Center', 'Contact Us', 'Privacy Policy', 'Terms'] },
-  { heading: 'Social', links: ['Twitter/X', 'Discord', 'Instagram', 'TikTok'] },
-]
-
 const ease = [0.16, 1, 0.3, 1] as const
 
 function safeExternalUrl(value: unknown): string {
@@ -65,6 +59,20 @@ function safeExternalUrl(value: unknown): string {
     return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : ''
   } catch {
     return ''
+  }
+}
+
+function safeFooterUrl(value: unknown): string {
+  const raw = String(value ?? '').replace(/<[^>]*>?/gm, '').trim()
+  if (!raw) return '#'
+  if (raw.startsWith('#')) return raw
+  if (raw.startsWith('/') && !raw.startsWith('//')) return raw
+
+  try {
+    const url = new URL(raw)
+    return ['https:', 'http:', 'mailto:', 'tel:'].includes(url.protocol) ? url.toString() : '#'
+  } catch {
+    return '#'
   }
 }
 
@@ -522,6 +530,8 @@ function CommunityStats({ dark }: { dark: boolean }) {
 function Footer({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const navigate = useNavigate()
+  const configuredColumns = get('footer', 'linkColumns')
+  const footerColumns = Array.isArray(configuredColumns) ? configuredColumns : []
 
   return (
     <footer id="download" className={`rounded-t-3xl md:rounded-t-[3rem] pt-16 md:pt-20 pb-0 px-4 sm:px-6 md:px-12 overflow-hidden transition-colors duration-500 ${dark ? 'bg-[#050505]' : 'bg-[#0A0A0A]'}`}>
@@ -550,13 +560,26 @@ function Footer({ dark }: { dark: boolean }) {
         </FadeUp>
         <FadeUp delay={0.1} className="w-full">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-10 py-10 md:py-14 border-b border-white/10 w-full">
-            {FOOTER_LINKS.map((col) => (
-              <div key={col.heading} className="flex flex-col gap-3 md:gap-4 min-w-0 w-full">
-                <p className="text-[10px] md:text-xs font-bold text-white/30 tracking-widest uppercase">{col.heading}</p>
+            {footerColumns.map((col: any, columnIndex: number) => (
+              <div key={col.id || `${col.heading}-${columnIndex}`} className="flex flex-col gap-3 md:gap-4 min-w-0 w-full">
+                <p className="text-[10px] md:text-xs font-bold text-white/30 tracking-widest uppercase">{String(col.heading || '')}</p>
                 <ul className="flex flex-col gap-2 md:gap-2.5">
-                  {col.links.map((link) => (
-                    <li key={link}><a href="#" className="text-xs md:text-sm text-white/50 hover:text-white transition-colors duration-150 break-words">{link}</a></li>
-                  ))}
+                  {(Array.isArray(col.links) ? col.links : []).map((link: any, linkIndex: number) => {
+                    const href = safeFooterUrl(link.url)
+                    const opensNewTab = href.startsWith('http://') || href.startsWith('https://')
+                    return (
+                      <li key={link.id || `${link.label}-${linkIndex}`}>
+                        <a
+                          href={href}
+                          target={opensNewTab ? '_blank' : undefined}
+                          rel={opensNewTab ? 'noopener noreferrer' : undefined}
+                          className="text-xs md:text-sm text-white/50 hover:text-white transition-colors duration-150 break-words"
+                        >
+                          {String(link.label || '')}
+                        </a>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             ))}

@@ -48,7 +48,39 @@ const DEFAULT_CONTENT: Record<string, any> = {
     ctaHeadline: "Ready to join the fun?",
     ctaTagline: "Let's play.",
     ctaBtn: "Download App",
-    copyright: "© 2026 Joe Yoke. All rights reserved."
+    copyright: "© 2026 Joe Yoke. All rights reserved.",
+    linkColumns: [
+      {
+        id: "product",
+        heading: "Product",
+        links: [
+          { id: "games", label: "Games", url: "/games" },
+          { id: "community", label: "Community", url: "#community" },
+          { id: "leaderboard", label: "Leaderboard", url: "#" },
+          { id: "app-store", label: "App Store", url: "/download" }
+        ]
+      },
+      {
+        id: "support",
+        heading: "Support",
+        links: [
+          { id: "help-center", label: "Help Center", url: "#" },
+          { id: "contact", label: "Contact Us", url: "#" },
+          { id: "privacy", label: "Privacy Policy", url: "#" },
+          { id: "terms", label: "Terms", url: "#" }
+        ]
+      },
+      {
+        id: "social",
+        heading: "Social",
+        links: [
+          { id: "twitter", label: "Twitter/X", url: "#" },
+          { id: "discord", label: "Discord", url: "#" },
+          { id: "instagram", label: "Instagram", url: "#" },
+          { id: "tiktok", label: "TikTok", url: "#" }
+        ]
+      }
+    ]
   },
   downloads: {
     pageTitle: "Get Joe Yoke",
@@ -57,6 +89,28 @@ const DEFAULT_CONTENT: Record<string, any> = {
     appStoreLink: "https://apple.com/app-store",
     directLink: "" 
   }
+};
+
+const mergeWithDefaults = (incoming: Record<string, any> | null | undefined) => {
+  const merged: Record<string, any> = { ...DEFAULT_CONTENT };
+
+  Object.entries(incoming || {}).forEach(([section, value]) => {
+    const defaultSection = DEFAULT_CONTENT[section];
+    if (
+      defaultSection &&
+      value &&
+      typeof defaultSection === 'object' &&
+      typeof value === 'object' &&
+      !Array.isArray(defaultSection) &&
+      !Array.isArray(value)
+    ) {
+      merged[section] = { ...defaultSection, ...value };
+    } else {
+      merged[section] = value;
+    }
+  });
+
+  return merged;
 };
 
 interface ContentContextType {
@@ -84,7 +138,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         if (error) console.error('Supabase fetch error:', error.message);
 
         if (data?.value) {
-          setContent((prev) => ({ ...prev, ...data.value }));
+          setContent(mergeWithDefaults(data.value));
         }
       } catch (err) {
         console.error('Error fetching content:', err);
@@ -102,7 +156,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         { event: '*', schema: 'public', table: 'kv_store_dd2dc34e', filter: 'key=eq.site_content' },
         (payload: any) => {
           if (payload.new?.value) {
-            setContent((prev) => ({ ...prev, ...payload.new.value }));
+            setContent(mergeWithDefaults(payload.new.value));
           }
         }
       )

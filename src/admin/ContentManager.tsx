@@ -97,6 +97,18 @@ const stripHtml = (html: string) => {
   return html.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
 };
 
+type FooterLink = {
+  id: string;
+  label: string;
+  url: string;
+};
+
+type FooterLinkColumn = {
+  id: string;
+  heading: string;
+  links: FooterLink[];
+};
+
 export default function ContentManager() {
   const { sectionId } = useParams();
   const { content, updateContent } = useContent();
@@ -126,6 +138,20 @@ export default function ContentManager() {
         }
       });
 
+      if (sectionId === 'footer' && Array.isArray(cleanedData.linkColumns)) {
+        cleanedData.linkColumns = cleanedData.linkColumns.map((column: FooterLinkColumn) => ({
+          ...column,
+          heading: stripHtml(column.heading || ''),
+          links: Array.isArray(column.links)
+            ? column.links.map((link: FooterLink) => ({
+                ...link,
+                label: stripHtml(link.label || ''),
+                url: stripHtml(link.url || '').trim(),
+              }))
+            : [],
+        }));
+      }
+
       await updateContent(sectionId, cleanedData);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -144,6 +170,44 @@ export default function ContentManager() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const updateFooterColumn = (columnIndex: number, patch: Partial<FooterLinkColumn>) => {
+    setFormData(prev => {
+      const columns = [...(prev.linkColumns || [])];
+      columns[columnIndex] = { ...columns[columnIndex], ...patch };
+      return { ...prev, linkColumns: columns };
+    });
+  };
+
+  const updateFooterLink = (columnIndex: number, linkIndex: number, patch: Partial<FooterLink>) => {
+    setFormData(prev => {
+      const columns = [...(prev.linkColumns || [])];
+      const links = [...(columns[columnIndex]?.links || [])];
+      links[linkIndex] = { ...links[linkIndex], ...patch };
+      columns[columnIndex] = { ...columns[columnIndex], links };
+      return { ...prev, linkColumns: columns };
+    });
+  };
+
+  const addFooterLink = (columnIndex: number) => {
+    setFormData(prev => {
+      const columns = [...(prev.linkColumns || [])];
+      const links = [...(columns[columnIndex]?.links || [])];
+      links.push({ id: `footer-link-${Date.now()}`, label: 'New Link', url: '#' });
+      columns[columnIndex] = { ...columns[columnIndex], links };
+      return { ...prev, linkColumns: columns };
+    });
+  };
+
+  const removeFooterLink = (columnIndex: number, linkIndex: number) => {
+    setFormData(prev => {
+      const columns = [...(prev.linkColumns || [])];
+      const links = [...(columns[columnIndex]?.links || [])];
+      links.splice(linkIndex, 1);
+      columns[columnIndex] = { ...columns[columnIndex], links };
+      return { ...prev, linkColumns: columns };
+    });
   };
 
   if (!currentSection) return <div className="p-8 text-white">Section not found</div>;
@@ -266,6 +330,74 @@ export default function ContentManager() {
                       className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C5FF00] transition-colors"
                     />
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {sectionId === 'footer' && (
+          <div className="flex flex-col gap-6 mt-4 pt-8 border-t border-white/10">
+            <div>
+              <h2 className="text-lg font-bold text-white">Footer Quick Links</h2>
+              <p className="text-sm text-white/40 mt-1">Edit each column heading, link label, and destination.</p>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              {(formData.linkColumns || []).map((column: FooterLinkColumn, columnIndex: number) => (
+                <div key={column.id || columnIndex} className="rounded-2xl border border-white/10 bg-black/20 p-5 md:p-6">
+                  <div className="flex flex-col gap-2 mb-5">
+                    <label className="text-xs font-bold tracking-widest text-gray-400 uppercase">Column Heading</label>
+                    <input
+                      type="text"
+                      value={column.heading || ''}
+                      onChange={(event) => updateFooterColumn(columnIndex, { heading: event.target.value })}
+                      className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C5FF00] transition-colors"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-4">
+                    {(column.links || []).map((link: FooterLink, linkIndex: number) => (
+                      <div key={link.id || linkIndex} className="grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr_auto] gap-3 items-end rounded-xl border border-white/10 p-4">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Link Label</label>
+                          <input
+                            type="text"
+                            value={link.label || ''}
+                            onChange={(event) => updateFooterLink(columnIndex, linkIndex, { label: event.target.value })}
+                            className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C5FF00] transition-colors"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Destination URL</label>
+                          <input
+                            type="text"
+                            value={link.url || ''}
+                            placeholder="/games or https://example.com"
+                            onChange={(event) => updateFooterLink(columnIndex, linkIndex, { url: event.target.value })}
+                            className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C5FF00] transition-colors"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeFooterLink(columnIndex, linkIndex)}
+                          className="h-[46px] px-4 rounded-xl border border-red-400/25 text-red-400/70 hover:border-red-400/50 hover:text-red-400 transition-colors flex items-center justify-center"
+                          aria-label={`Remove ${link.label || 'footer link'}`}
+                          title="Remove link"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => addFooterLink(columnIndex)}
+                    className="mt-4 flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/20 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Add Link
+                  </button>
                 </div>
               ))}
             </div>
