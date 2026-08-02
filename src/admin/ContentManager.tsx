@@ -4,6 +4,7 @@ import { useContent } from './ContentContext';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { Save, CheckCircle, Plus, Trash2 } from 'lucide-react';
+import TrendingGamesManager from './TrendingGamesManager';
 
 const SECTIONS: Record<string, any> = {
   hero: {
@@ -48,6 +49,7 @@ const SECTIONS: Record<string, any> = {
       { key: 'headline', label: 'Headline' },
       { key: 'ctaLabel', label: 'CTA Label', type: 'text' },
       { key: 'discordUrl', label: 'Discord Invite URL', type: 'text' },
+      { key: 'discordIcon', label: 'Discord Button Logo', type: 'image' },
       { key: 'stat1_value', label: 'Stat 1 Value', type: 'text' }, { key: 'stat1_label', label: 'Stat 1 Label', type: 'text' },
       { key: 'stat2_value', label: 'Stat 2 Value', type: 'text' }, { key: 'stat2_label', label: 'Stat 2 Label', type: 'text' },
       { key: 'stat3_value', label: 'Stat 3 Value', type: 'text' }, { key: 'stat3_label', label: 'Stat 3 Label', type: 'text' },
@@ -173,6 +175,16 @@ export default function ContentManager() {
                   onChange={(e) => handleImageUpload(field.key, e)}
                   className="text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#C5FF00] file:text-black hover:file:bg-[#d4ff33] cursor-pointer transition-colors"
                 />
+                {formData[field.key] && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, [field.key]: '' }))}
+                    className="flex w-fit items-center gap-2 rounded-xl border border-red-400/25 px-4 py-2.5 text-sm font-bold text-red-400/75 hover:border-red-400/50 hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Remove image
+                  </button>
+                )}
               </div>
             ) : field.type === 'text' ? (
               <input 
@@ -271,6 +283,8 @@ export default function ContentManager() {
           </button>
         </div>
       </div>
+
+      {sectionId === 'games' && <TrendingGamesManager />}
 
       {showSuccess && (
         <div className="fixed bottom-10 right-10 bg-[#C5FF00] text-black px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 transition-all duration-300">

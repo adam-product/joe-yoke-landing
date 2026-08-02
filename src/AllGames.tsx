@@ -183,10 +183,15 @@ export default function AllGames() {
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
 
-          <div className="flex items-center gap-2 ml-2">
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            aria-label="Go to Joe Yoke home"
+            className={`flex items-center gap-2 ml-2 rounded-lg transition-opacity hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5FF00] ${darkMode ? 'text-white/70' : 'text-[#1A1A1A]/70'}`}
+          >
             <img src={darkMode ? logoNavLight : logoNavDark} alt="Joe Yoke" className="w-6 h-6 rounded-lg object-cover" />
-            <span className={`font-black text-sm tracking-tighter uppercase ${darkMode ? 'text-white/70' : 'text-[#1A1A1A]/70'}`}>Joe Yoke</span>
-          </div>
+            <span className="font-black text-sm tracking-tighter uppercase">Joe Yoke</span>
+          </button>
 
           <div className="flex-1" />
 

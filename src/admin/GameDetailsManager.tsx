@@ -1,4 +1,5 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { CheckCircle, ChevronDown, ChevronUp, ImagePlus, Plus, Save, Trash2 } from 'lucide-react'
 import { fallbackGameImage } from '../gameAssets'
 import { useGames, type GameEntry, type GameGuideStep } from './GamesContext'
@@ -15,16 +16,22 @@ function readImage(file: File, onLoad: (value: string) => void) {
 
 export default function GameDetailsManager() {
   const { games, loading, updateGame } = useGames()
-  const [selectedId, setSelectedId] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedId = searchParams.get('game') ?? ''
+  const [selectedId, setSelectedId] = useState(requestedId)
   const [draft, setDraft] = useState<GameEntry | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (requestedId && games.some(game => game.id === requestedId) && selectedId !== requestedId) {
+      setSelectedId(requestedId)
+      return
+    }
     if (!selectedId && games[0]) setSelectedId(games[0].id)
     if (selectedId && !games.some(game => game.id === selectedId) && games[0]) setSelectedId(games[0].id)
-  }, [games, selectedId])
+  }, [games, requestedId, selectedId])
 
   useEffect(() => {
     const selected = games.find(game => game.id === selectedId)
@@ -121,7 +128,10 @@ export default function GameDetailsManager() {
             {games.map(game => (
               <button
                 key={game.id}
-                onClick={() => setSelectedId(game.id)}
+                onClick={() => {
+                  setSelectedId(game.id)
+                  setSearchParams({ game: game.id }, { replace: true })
+                }}
                 className={`min-w-40 lg:min-w-0 w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${selectedId === game.id ? 'bg-[#C5FF00] text-black' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
               >
                 <img src={fallbackGameImage(game)} alt="" className="w-10 h-10 rounded-lg object-cover" />
@@ -216,6 +226,16 @@ export default function GameDetailsManager() {
                           Upload image
                           <input type="file" accept="image/*" onChange={event => uploadStepImage(step.id, event)} className="hidden" />
                         </label>
+                        {step.imageUrl && (
+                          <button
+                            type="button"
+                            onClick={() => updateStep(step.id, { imageUrl: '' })}
+                            className="flex items-center justify-center gap-2 rounded-lg border border-red-400/20 px-3 py-2 text-xs font-bold text-red-400/70 hover:border-red-400/40 hover:text-red-400 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Remove image
+                          </button>
+                        )}
                       </div>
                       <div className="flex flex-col gap-4">
                         <label className="flex flex-col gap-2">

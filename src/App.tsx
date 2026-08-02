@@ -14,6 +14,7 @@ import gameImg4 from '@/imports/photo_2026-07-23_20-54-19.jpg'
 import { useGames } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
 import { useTheme } from './ThemeContext'
+import { fallbackGameImage } from './gameAssets'
 
 const supabaseUrl = `https://${projectId}.supabase.co`;
 const supabase = createClient(supabaseUrl, publicAnonKey);
@@ -369,9 +370,9 @@ function TrendingGames({ dark }: { dark: boolean }) {
   const navigate = useNavigate()
   const { games } = useGames()
   const { get } = useContent()
-  const featured = games.filter(g => g.featured).slice(0, 4)
+  const featured = games.filter(g => g.featured)
   const displayGames: Game[] = featured.length > 0
-    ? featured.map((g, i) => ({ id: g.id, badge: g.badge, title: g.title, description: g.description, image: g.imageUrl || [gameImg1, gameImg2, gameImg3, gameImg4][i] || gameImg1 }))
+    ? featured.map(g => ({ id: g.id, badge: g.badge, title: g.title, description: g.description, image: fallbackGameImage(g) }))
     : GAMES
 
   return (
@@ -461,6 +462,7 @@ function CommunityStats({ dark }: { dark: boolean }) {
   const { get } = useContent()
   const stats = [1, 2, 3, 4].map(n => ({ value: get('stats', `stat${n}_value`), label: get('stats', `stat${n}_label`) }))
   const discordUrl = safeExternalUrl(get('stats', 'discordUrl'))
+  const discordIcon = String(get('stats', 'discordIcon') ?? '').trim()
 
   const joinDiscord = () => {
     trackEvent('join_discord_click')
@@ -482,7 +484,11 @@ function CommunityStats({ dark }: { dark: boolean }) {
                   onClick={joinDiscord}
                   className="group flex items-center gap-3 bg-[#C5FF00] text-[#1A1A1A] rounded-full pl-6 pr-2 py-2 font-bold text-xs md:text-sm hover:bg-[#d4ff33] transition-colors w-fit shrink-0"
                 >
-                  <DiscordIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                  {discordIcon ? (
+                    <img src={discordIcon} alt="" aria-hidden className="w-4 h-4 md:w-5 md:h-5 shrink-0 object-contain" />
+                  ) : (
+                    <DiscordIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                  )}
                   <span dangerouslySetInnerHTML={renderHTML(get('stats', 'ctaLabel'))} className="[&_p]:m-0" />
                   <span className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center transition-transform group-hover:rotate-45 duration-300 shrink-0">
                     <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-[#C5FF00]" />
