@@ -46,7 +46,7 @@ const privacySections: Section[] = [
           <li><strong className="text-current">Device and technical information:</strong> device type, operating system, app version, language, IP address, browser type, crash information, diagnostic logs, security events, and approximate location inferred from IP address.</li>
           <li><strong className="text-current">Website and app usage:</strong> pages viewed, buttons used, referral source, session activity, performance measurements, and anonymous or pseudonymous visitor identifiers used for analytics.</li>
           <li><strong className="text-current">Uploads and permissions:</strong> images or other files you voluntarily upload and information accessed through device permissions you choose to grant, such as notifications or photo-library access.</li>
-          <li><strong className="text-current">Support communications:</strong> messages, attachments, and contact details you provide when asking for help, reporting a problem, or submitting feedback.</li>
+          <li><strong className="text-current">Support communications:</strong> messages, attachments, and contact details you provide when asking for help, reporting a problem, or submitting feedback. Support queries may be processed by an automated assistant and reviewed by the Joe Yoke support team.</li>
         </BulletList>
       </div>
     ),
@@ -61,6 +61,7 @@ const privacySections: Section[] = [
         <li>Authenticate users, protect accounts, prevent cheating, spam, fraud, abuse, and other security threats.</li>
         <li>Moderate community activity, investigate reports, enforce our Terms &amp; Conditions, and protect players.</li>
         <li>Respond to support requests and send important service, safety, or account communications.</li>
+        <li>Generate automatic support answers, identify requests that need human review, and preserve conversation history so an administrator can reply.</li>
         <li>Measure traffic, reliability, and performance and understand how users interact with Joe Yoke.</li>
         <li>Comply with legal duties and establish, exercise, or defend legal claims.</li>
       </BulletList>
@@ -83,7 +84,7 @@ const privacySections: Section[] = [
         <Paragraph>We may share information only as reasonably necessary with:</Paragraph>
         <BulletList>
           <li><strong className="text-current">Other users:</strong> information you make visible through your profile, game rooms, leaderboards, messages, or other social features.</li>
-          <li><strong className="text-current">Service providers:</strong> vendors that provide hosting, databases, authentication, file storage, analytics, performance monitoring, communications, customer support, and security. Our current technology stack may include Supabase and Vercel.</li>
+          <li><strong className="text-current">Service providers:</strong> vendors that provide hosting, databases, authentication, file storage, analytics, performance monitoring, communications, automated customer support, and security. Our current technology stack may include Supabase, Vercel, and OpenAI.</li>
           <li><strong className="text-current">App platforms:</strong> Apple, Google, or other distributors when needed to publish, operate, diagnose, or support the app.</li>
           <li><strong className="text-current">Legal and safety recipients:</strong> regulators, courts, law enforcement, advisers, or affected parties when disclosure is required by law or reasonably necessary to protect rights, safety, and service integrity.</li>
           <li><strong className="text-current">Business successors:</strong> a buyer, investor, or successor in connection with a proposed or completed merger, financing, reorganization, or transfer of the service, subject to appropriate safeguards.</li>
@@ -270,33 +271,38 @@ const termsSections: Section[] = [
     content: <Paragraph>We may add, change, suspend, or discontinue features; deploy updates; impose reasonable usage limits; or perform maintenance. We aim to provide a reliable service but do not guarantee uninterrupted or error-free access. You may need to install updates to continue using the app safely.</Paragraph>,
   },
   {
+    id: 'automated-support',
+    title: '12. Automated support',
+    content: <Paragraph>Joe Yoke may use an AI assistant to provide immediate help based on available product information and recent conversation context. Automated answers may be incomplete or incorrect and do not make refunds, account decisions, legal determinations, or other binding commitments. Do not send passwords, payment details, one-time codes, or unnecessary sensitive information. Requests needing individual review may be escalated to an administrator.</Paragraph>,
+  },
+  {
     id: 'termination',
-    title: '12. Suspension, termination, and deletion',
+    title: '13. Suspension, termination, and deletion',
     content: <Paragraph>You may stop using Joe Yoke at any time and may request account deletion through the available in-app or support method. We may restrict or terminate access for a serious or repeated violation, legal requirement, safety risk, fraud, or threat to the service. Where reasonable and lawful, we will provide notice or an opportunity to appeal. Sections that by their nature should survive termination—including ownership, disclaimers, and liability terms—will remain in effect.</Paragraph>,
   },
   {
     id: 'disclaimers',
-    title: '13. Disclaimers',
+    title: '14. Disclaimers',
     content: <Paragraph>To the fullest extent permitted by law, Joe Yoke is provided “as is” and “as available,” without warranties of uninterrupted availability, fitness for a particular purpose, non-infringement, or error-free operation. Nothing in these terms excludes warranties or consumer rights that cannot lawfully be excluded.</Paragraph>,
   },
   {
     id: 'liability',
-    title: '14. Limitation of liability',
+    title: '15. Limitation of liability',
     content: <Paragraph>To the fullest extent permitted by law, Joe Yoke’s operator and service providers will not be liable for indirect, incidental, special, consequential, or punitive damages, or loss of profits, data, goodwill, or opportunities arising from use of the service. Any aggregate liability will be limited to the greater of the amount you paid to Joe Yoke during the 12 months before the claim or the minimum amount required by law. These limits do not apply where liability cannot lawfully be limited.</Paragraph>,
   },
   {
     id: 'law',
-    title: '15. Applicable law and disputes',
+    title: '16. Applicable law and disputes',
     content: <Paragraph>These terms are governed by the applicable laws of the jurisdiction in which the Joe Yoke service operator is established, without overriding mandatory consumer protections that apply where you live. Before starting formal proceedings, you and Joe Yoke should attempt in good faith to resolve the issue through the official support channel, unless law allows you to proceed directly.</Paragraph>,
   },
   {
     id: 'changes',
-    title: '16. Changes to these terms',
+    title: '17. Changes to these terms',
     content: <Paragraph>We may update these terms to reflect changes to the service, law, or safety practices. We will post the revised terms with a new effective date and provide additional notice when required. If you do not agree to a material update, you should stop using the service and may request account deletion.</Paragraph>,
   },
   {
     id: 'contact',
-    title: '17. Contact',
+    title: '18. Contact',
     content: <Paragraph>For questions, complaints, or legal notices, use the official support contact method published in the Joe Yoke app, the applicable app-store listing, or on joeyoke.com. Include enough information for us to understand the issue, but never send your password.</Paragraph>,
   },
 ]

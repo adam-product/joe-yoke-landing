@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, Users, ExternalLink, LogOut, ChevronDown, Gamepad2, Type, BarChart2, LayoutTemplate, Layers, Download, BookOpen } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, ExternalLink, LogOut, ChevronDown, Gamepad2, Type, BarChart2, LayoutTemplate, Layers, Download, BookOpen, MessagesSquare } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import faviconImg from '@/imports/favicon.ico-1.jpg';
 
@@ -87,6 +87,10 @@ export default function AdminShell() {
 
           <NavLink to="/game-details" className={navLinkClass}>
             <BookOpen className="w-5 h-5" /> Game Details
+          </NavLink>
+
+          <NavLink to="/support" className={navLinkClass}>
+            <MessagesSquare className="w-5 h-5" /> Support Inbox
           </NavLink>
 
           <NavLink to="/users" className={navLinkClass}>

@@ -13,8 +13,8 @@ export const MOCK_USERS = [
 
 // ADDED EXPORT
 export const ROLE_PERMISSIONS: Record<string, string[]> = {
-  'Super Admin': ['view_dashboard', 'edit_content', 'manage_users', 'view_analytics'],
-  'Editor': ['view_dashboard', 'edit_content', 'view_analytics'],
+  'Super Admin': ['view_dashboard', 'edit_content', 'manage_users', 'view_analytics', 'manage_support'],
+  'Editor': ['view_dashboard', 'edit_content', 'view_analytics', 'manage_support'],
   'Viewer': ['view_dashboard', 'view_analytics']
 };
 

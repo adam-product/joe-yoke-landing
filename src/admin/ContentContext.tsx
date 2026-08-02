@@ -64,7 +64,7 @@ const DEFAULT_CONTENT: Record<string, any> = {
         id: "support",
         heading: "Support",
         links: [
-          { id: "help-center", label: "Help Center", url: "#" },
+          { id: "help-center", label: "Help Center", url: "#help-center" },
           { id: "contact", label: "Contact Us", url: "#" },
           { id: "privacy", label: "Privacy Policy", url: "/privacy-policy" },
           { id: "terms", label: "Terms & Conditions", url: "/terms" }
@@ -122,6 +122,9 @@ const mergeWithDefaults = (incoming: Record<string, any> | null | undefined) => 
           ? column.links.map((link: any) => {
               if (link.id === 'privacy' && (!link.url || link.url === '#')) {
                 return { ...link, url: '/privacy-policy' };
+              }
+              if (link.id === 'help-center' && (!link.url || link.url === '#')) {
+                return { ...link, url: '#help-center' };
               }
               if (link.id === 'terms' && (!link.url || link.url === '#')) {
                 return { ...link, label: link.label === 'Terms' ? 'Terms & Conditions' : link.label, url: '/terms' };
