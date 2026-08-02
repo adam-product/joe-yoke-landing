@@ -1,5 +1,3 @@
-import { projectId, publicAnonKey } from '../utils/supabase/info'
-
 export type SupportRole = 'user' | 'assistant' | 'admin'
 export type SupportStatus = 'open' | 'needs_attention' | 'resolved'
 
@@ -24,15 +22,13 @@ export type SupportConversation = {
   messages: SupportMessage[]
 }
 
-const API_ROOT = `https://${projectId}.supabase.co/functions/v1/server/make-server-dd2dc34e/support`
+const API_ROOT = '/api/support'
 
 async function request<T>(path: string, options: RequestInit = {}, adminToken?: string): Promise<T> {
   const response = await fetch(`${API_ROOT}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      apikey: publicAnonKey,
-      Authorization: `Bearer ${publicAnonKey}`,
       ...(adminToken ? { 'x-admin-token': adminToken } : {}),
       ...(options.headers || {}),
     },
@@ -56,22 +52,22 @@ export async function sendSupportMessage(input: {
     conversation: SupportConversation
     accessToken: string
     reply: SupportMessage
-  }>('/chat', { method: 'POST', body: JSON.stringify(input) })
+  }>('', { method: 'POST', body: JSON.stringify(input) })
 }
 
 export async function getVisitorConversation(conversationId: string, accessToken: string) {
   return request<{ conversation: SupportConversation }>(
-    `/conversation/${encodeURIComponent(conversationId)}?token=${encodeURIComponent(accessToken)}`,
+    `?conversationId=${encodeURIComponent(conversationId)}&token=${encodeURIComponent(accessToken)}`,
   )
 }
 
 export async function getAdminConversations(adminToken: string) {
-  return request<{ conversations: SupportConversation[] }>('/admin/conversations', {}, adminToken)
+  return request<{ conversations: SupportConversation[] }>('?admin=list', {}, adminToken)
 }
 
 export async function sendAdminReply(conversationId: string, message: string, adminToken: string) {
   return request<{ conversation: SupportConversation }>(
-    `/admin/conversations/${encodeURIComponent(conversationId)}/reply`,
+    `?admin=reply&conversationId=${encodeURIComponent(conversationId)}`,
     { method: 'POST', body: JSON.stringify({ message }) },
     adminToken,
   )
@@ -83,7 +79,7 @@ export async function updateAdminConversation(
   adminToken: string,
 ) {
   return request<{ conversation: SupportConversation }>(
-    `/admin/conversations/${encodeURIComponent(conversationId)}`,
+    `?admin=update&conversationId=${encodeURIComponent(conversationId)}`,
     { method: 'PATCH', body: JSON.stringify(update) },
     adminToken,
   )
