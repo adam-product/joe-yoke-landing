@@ -31,7 +31,9 @@ export default defineConfig({
       hostname: 'https://www.joeyoke.com',
       dynamicRoutes: publicRoutes,
       exclude: adminRoutes,
-      readable: true,
+      // Keep sitemap URL values compact. Google Search Console can report
+      // "Couldn't fetch" when pretty-printed XML contains extra whitespace.
+      readable: false,
       generateRobotsTxt: true,
       robots: [
         {
