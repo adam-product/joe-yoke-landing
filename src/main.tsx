@@ -16,10 +16,12 @@ import UserManager from './admin/UserManager.tsx'
 import ContentManager from './admin/ContentManager.tsx'
 import GameDetailsManager from './admin/GameDetailsManager.tsx'
 import SupportManager from './admin/SupportManager.tsx'
+import SeoManager from './admin/SeoManager.tsx'
 import SupportChatWidget from './SupportChatWidget.tsx'
 import { AuthProvider } from './admin/AuthContext.tsx'
 import { ContentProvider } from './admin/ContentContext.tsx'
 import { GamesProvider } from './admin/GamesContext.tsx'
+import { SeoProvider } from './admin/SeoContext.tsx'
 import { ThemeProvider } from './ThemeContext.tsx'
 import Seo from './Seo.tsx'
 import './index.css'
@@ -89,6 +91,10 @@ const adminRoutes = [
         element: <GameDetailsManager />
       },
       {
+        path: "seo",
+        element: <SeoManager />
+      },
+      {
         path: "support",
         element: <SupportManager />
       }
@@ -115,10 +121,12 @@ createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <ContentProvider>
             <GamesProvider>
-              <RouterProvider router={router} />
-              {!isAdminHostname && <SupportChatWidget />}
-              {!isAdminHostname && <Analytics />}
-              {!isAdminHostname && <SpeedInsights />}
+              <SeoProvider>
+                <RouterProvider router={router} />
+                {!isAdminHostname && <SupportChatWidget />}
+                {!isAdminHostname && <Analytics />}
+                {!isAdminHostname && <SpeedInsights />}
+              </SeoProvider>
             </GamesProvider>
           </ContentProvider>
         </AuthProvider>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download as DownloadIcon } from 'lucide-react';
 import { useContent } from './admin/ContentContext';
+import { useSeoSettings } from './admin/SeoContext';
 import { trackEvent } from './App';
 import logoNavDark from '@/imports/logo-nav-dark.png';
 // Updated to .png below!
@@ -29,6 +30,8 @@ const cleanUrl = (rawUrl: string) => {
 export default function DownloadPage() {
   const navigate = useNavigate();
   const { get } = useContent();
+  const { settings, pageSeo } = useSeoSettings();
+  const downloadSeo = pageSeo('download');
 
   const title = cleanText(get('downloads', 'pageTitle')) || 'Get Joe Yoke';
   const subtitle = cleanText(get('downloads', 'pageSubtitle')) || 'Choose your platform to start playing.';
@@ -52,9 +55,12 @@ export default function DownloadPage() {
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex flex-col relative overflow-hidden font-sans antialiased text-white">
       <Seo
-        title="Download Joe Yoke for iOS and Android"
-        description="Download Joe Yoke for iPhone or Android and start playing multiplayer games with your friends."
-        path="/download"
+        title={downloadSeo.title || settings.global.defaultTitle}
+        description={downloadSeo.description || settings.global.defaultDescription}
+        path={downloadSeo.path}
+        image={settings.global.defaultImage}
+        siteName={settings.global.siteName}
+        noIndex={!downloadSeo.indexable}
       />
       <StructuredData
         data={{
@@ -94,8 +100,8 @@ export default function DownloadPage() {
           className="w-full max-w-md flex flex-col items-center gap-8"
         >
           <div className="text-center flex flex-col gap-3">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-none">{title}</h1>
-            <p className="text-white/50 text-sm md:text-base">{subtitle}</p>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-none">{downloadSeo.heading || title}</h1>
+            <p className="text-white/50 text-sm md:text-base">{downloadSeo.intro || subtitle}</p>
           </div>
 
           <div className="w-full flex flex-col gap-4">

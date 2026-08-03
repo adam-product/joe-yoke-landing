@@ -13,6 +13,7 @@ import gameImg3 from '@/imports/photo_2026-07-23_20-54-21.jpg'
 import gameImg4 from '@/imports/photo_2026-07-23_20-54-19.jpg'
 import { useGames } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
+import { useSeoSettings } from './admin/SeoContext'
 import { useTheme } from './ThemeContext'
 import { fallbackGameImage } from './gameAssets'
 import Seo from './Seo'
@@ -268,7 +269,7 @@ function Header({ darkMode, setDarkMode }: { darkMode: boolean; setDarkMode: (v:
   )
 }
 
-function Hero({ dark }: { dark: boolean }) {
+function Hero({ dark, heading, intro }: { dark: boolean; heading?: string; intro?: string }) {
   const { get } = useContent()
   const navigate = useNavigate()
   const heroSrc = get('hero', 'heroImage') || pyramidImg
@@ -278,9 +279,17 @@ function Hero({ dark }: { dark: boolean }) {
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-8 overflow-hidden">
         <div className="w-full md:w-3/5 lg:w-2/3 flex flex-col gap-6 md:gap-8 z-10 shrink-0 min-w-0">
           <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.9, ease, delay: 0.1 }}>
-            <div className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tighter transition-colors duration-500 break-words w-full [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('hero', 'headline'))} />
+            {heading ? (
+              <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tighter transition-colors duration-500 break-words w-full ${dark ? 'text-white' : 'text-[#1A1A1A]'}`}>{heading}</h1>
+            ) : (
+              <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tighter transition-colors duration-500 break-words w-full [&_p]:m-0 ${dark ? 'text-white' : 'text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(get('hero', 'headline'))} />
+            )}
           </motion.div>
-          <motion.div className={`w-full max-w-md break-words text-base md:text-lg leading-relaxed transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }} dangerouslySetInnerHTML={renderHTML(get('hero', 'subtext'))} />
+          {intro ? (
+            <motion.p className={`w-full max-w-md break-words text-base md:text-lg leading-relaxed transition-colors duration-500 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }}>{intro}</motion.p>
+          ) : (
+            <motion.div className={`w-full max-w-md break-words text-base md:text-lg leading-relaxed transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/50' : 'text-[#1A1A1A]/50'}`} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.3 }} dangerouslySetInnerHTML={renderHTML(get('hero', 'subtext'))} />
+          )}
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.45 }}>
             <Magnetic>
               <button 
@@ -629,6 +638,8 @@ function LiquidGlassBar({ dark }: { dark: boolean }) {
 
 export default function App() {
   const { darkMode, setDarkMode } = useTheme()
+  const { settings, pageSeo } = useSeoSettings()
+  const homeSeo = pageSeo('home')
 
   // Robust visit tracker with IP API + Timezone fallback + User Agent OS parser
   useEffect(() => {
@@ -705,32 +716,35 @@ export default function App() {
   return (
     <div className={`font-sans antialiased overflow-x-hidden w-full relative min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
       <Seo
-        title="Joe Yoke – Multiplayer Games and Gaming Community"
-        description="Play multiplayer games, discover new favorites, connect with friends, and join the Joe Yoke gaming community."
-        path="/"
+        title={homeSeo.title || settings.global.defaultTitle}
+        description={homeSeo.description || settings.global.defaultDescription}
+        path={homeSeo.path}
+        image={settings.global.defaultImage}
+        siteName={settings.global.siteName}
+        noIndex={!homeSeo.indexable}
       />
       <StructuredData
         data={[
           {
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            name: 'Joe Yoke',
+            name: settings.global.siteName,
             url: 'https://www.joeyoke.com/',
           },
           {
             '@context': 'https://schema.org',
             '@type': 'Organization',
-            name: 'Joe Yoke',
+            name: settings.global.siteName,
             url: 'https://www.joeyoke.com/',
             logo: 'https://www.joeyoke.com/favicon.png',
-            description: 'A multiplayer gaming platform and community for playing games with friends.',
+            description: settings.global.organizationDescription,
           },
         ]}
       />
       <Header darkMode={darkMode} setDarkMode={setDarkMode} />
       <LiquidGlassBar dark={darkMode} />
       <main>
-        <Hero dark={darkMode} />
+        <Hero dark={darkMode} heading={homeSeo.heading} intro={homeSeo.intro} />
         <About dark={darkMode} />
         <TrendingGames dark={darkMode} />
         <Categories dark={darkMode} />

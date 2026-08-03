@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Moon, Sun } from 'lucide-react'
 import { badgeColor, useGames } from './admin/GamesContext'
+import { useSeoSettings } from './admin/SeoContext'
 import { fallbackGameImage } from './gameAssets'
 import { useTheme } from './ThemeContext'
 import logoNavLight from '@/imports/logo-nav-light.png'
@@ -15,6 +16,8 @@ export default function GameDetailPage() {
   const { games, loading } = useGames()
   const { darkMode, toggleDarkMode } = useTheme()
   const game = games.find(item => item.id === gameId)
+  const { settings, gameSeo } = useSeoSettings()
+  const resolvedSeo = game ? gameSeo(game) : null
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -62,10 +65,11 @@ export default function GameDetailPage() {
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[#0A0A0A] text-white' : 'bg-[#F8F9FA] text-[#1A1A1A]'}`}>
       <Seo
-        title={`How to Play ${game.title} | Joe Yoke`}
-        description={game.description}
+        title={resolvedSeo?.title || settings.global.defaultTitle}
+        description={resolvedSeo?.description || game.description}
         path={`/games/${encodeURIComponent(game.id)}`}
         image={banner}
+        siteName={settings.global.siteName}
         type="article"
       />
       <StructuredData
@@ -83,7 +87,7 @@ export default function GameDetailPage() {
             '@context': 'https://schema.org',
             '@type': 'VideoGame',
             name: game.title,
-            description: game.description,
+            description: resolvedSeo?.description || game.description,
             image: structuredImage,
             url: canonicalUrl,
             genre: game.badge,
@@ -116,7 +120,7 @@ export default function GameDetailPage() {
               <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4" style={{ background: `${accent}25`, color: accent, border: `1px solid ${accent}55` }}>
                 {game.badge}
               </span>
-              <h1 className="text-white text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-none">{game.title}</h1>
+              <h1 className="text-white text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-none">{resolvedSeo?.heading || game.title}</h1>
             </div>
           </div>
         </section>

@@ -8,6 +8,7 @@ type SeoProps = {
   description: string
   path: string
   image?: string
+  siteName?: string
   noIndex?: boolean
   type?: 'website' | 'article'
 }
@@ -28,6 +29,7 @@ export default function Seo({
   description,
   path,
   image = DEFAULT_SHARE_IMAGE,
+  siteName = 'Joe Yoke',
   noIndex = false,
   type = 'website',
 }: SeoProps) {
@@ -42,7 +44,7 @@ export default function Seo({
     description: safeDescription,
     robots: noIndex ? 'noindex,nofollow,noarchive' : 'index,follow',
     ogType: type,
-    ogSiteName: 'Joe Yoke',
+    ogSiteName: siteName,
     ogTitle: title,
     ogDescription: safeDescription,
     ogUrl: canonicalUrl,

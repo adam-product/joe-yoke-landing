@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Search, Sun, Moon, Gamepad2, Flame } from 'lucide-react'
 import { useGames, badgeColor, type GameEntry } from './admin/GamesContext'
 import { useContent } from './admin/ContentContext'
+import { useSeoSettings } from './admin/SeoContext'
 import { useTheme } from './ThemeContext'
 import { fallbackGameImage } from './gameAssets'
 import logoNavLight from '@/imports/logo-nav-light.png'
@@ -137,6 +138,8 @@ export default function AllGames() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('All')
   const { darkMode, toggleDarkMode } = useTheme()
+  const { settings, pageSeo } = useSeoSettings()
+  const gamesSeo = pageSeo('games')
   const playNowLabel = plainText(get('playNow', 'label'), 'Play Now')
   const playNowDestination = normalizePlayNowDestination(get('playNow', 'destination'))
 
@@ -170,9 +173,12 @@ export default function AllGames() {
   return (
     <div className={`min-h-screen transition-colors duration-500 relative ${darkMode ? 'bg-[#0A0A0A] text-white' : 'bg-[#F8F9FA] text-[#1A1A1A]'}`}>
       <Seo
-        title="Multiplayer Games to Play With Friends | Joe Yoke"
-        description="Explore Joe Yoke multiplayer games, learn how each game works, and find your next favorite game to play with friends."
-        path="/games"
+        title={gamesSeo.title || settings.global.defaultTitle}
+        description={gamesSeo.description || settings.global.defaultDescription}
+        path={gamesSeo.path}
+        image={settings.global.defaultImage}
+        siteName={settings.global.siteName}
+        noIndex={!gamesSeo.indexable}
       />
       <StructuredData
         data={{
@@ -247,10 +253,10 @@ export default function AllGames() {
               <Gamepad2 className="w-3.5 h-3.5" /> Game Library
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-none mb-3">
-              All Games
+              {gamesSeo.heading || 'All Games'}
             </h1>
             <p className={darkMode ? 'text-white/40 text-lg' : 'text-[#1A1A1A]/70 text-lg'}>
-              {games.length} game{games.length !== 1 ? 's' : ''} — play anything, connect with everyone.
+              {gamesSeo.intro || `${games.length} game${games.length !== 1 ? 's' : ''} - play anything, connect with everyone.`}
             </p>
           </div>
 
