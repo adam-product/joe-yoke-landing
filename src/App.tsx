@@ -324,11 +324,11 @@ function About({ dark }: { dark: boolean }) {
   const pills = [get('about', 'pill1'), get('about', 'pill2'), get('about', 'pill3')].filter(Boolean)
 
   return (
-    <section className={`px-5 py-14 sm:px-6 sm:py-16 md:px-12 md:py-20 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
-      <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-8 sm:gap-10 md:gap-12">
+    <section className={`overflow-x-clip px-6 py-14 sm:py-16 md:px-12 md:py-20 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
+      <div className="mx-auto flex w-full min-w-0 max-w-4xl flex-col items-center gap-8 sm:gap-10 md:gap-12">
         <FadeUp className="w-full">
           <div
-            className={`mx-auto w-full max-w-[42rem] break-normal hyphens-none text-center text-[1.125rem] leading-[1.5] tracking-[-0.012em] font-medium transition-colors duration-500 sm:text-2xl sm:leading-[1.4] md:max-w-4xl md:text-3xl md:leading-snug [&_p]:m-0 [&_span]:whitespace-normal [&_span]:break-normal ${dark ? 'text-white/60' : 'text-[#1A1A1A]/70'}`}
+            className={`mx-auto w-full min-w-0 max-w-[42rem] break-normal hyphens-none text-balance text-center text-[1.125rem] leading-[1.5] tracking-[-0.012em] font-medium transition-colors duration-500 sm:text-2xl sm:leading-[1.4] md:max-w-4xl md:text-3xl md:leading-snug [&_p]:m-0 [&_*]:!whitespace-normal [&_*]:!break-normal ${dark ? 'text-white/60' : 'text-[#1A1A1A]/70'}`}
             dangerouslySetInnerHTML={renderHTML(get('about', 'quote'))}
           />
         </FadeUp>
