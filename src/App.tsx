@@ -324,21 +324,24 @@ function About({ dark }: { dark: boolean }) {
   const pills = [get('about', 'pill1'), get('about', 'pill2'), get('about', 'pill3')].filter(Boolean)
 
   return (
-    <section className={`py-16 md:py-20 px-4 sm:px-6 md:px-12 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
-      <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-10 md:gap-12">
+    <section className={`px-5 py-14 sm:px-6 sm:py-16 md:px-12 md:py-20 transition-colors duration-500 ${dark ? 'bg-[#0A0A0A]' : 'bg-[#F8F9FA]'}`}>
+      <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-8 sm:gap-10 md:gap-12">
         <FadeUp className="w-full">
-          <div className={`w-full break-words text-xl sm:text-2xl md:text-3xl text-center leading-snug font-medium transition-colors duration-500 [&_p]:m-0 ${dark ? 'text-white/60' : 'text-[#1A1A1A]/70'}`} dangerouslySetInnerHTML={renderHTML(get('about', 'quote'))} />
+          <div
+            className={`mx-auto w-full max-w-[42rem] break-normal hyphens-none text-center text-[1.125rem] leading-[1.5] tracking-[-0.012em] font-medium transition-colors duration-500 sm:text-2xl sm:leading-[1.4] md:max-w-4xl md:text-3xl md:leading-snug [&_p]:m-0 [&_span]:whitespace-normal [&_span]:break-normal ${dark ? 'text-white/60' : 'text-[#1A1A1A]/70'}`}
+            dangerouslySetInnerHTML={renderHTML(get('about', 'quote'))}
+          />
         </FadeUp>
-        <FadeUp delay={0.1}>
-          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
+        <FadeUp delay={0.1} className="w-full">
+          <div className="flex w-full flex-nowrap items-center justify-center gap-1.5 sm:gap-2 md:gap-3">
             {pills.slice(0, -1).map((word, i) => (
-              <span key={i} className={`px-4 md:px-6 py-2 md:py-2.5 rounded-full border font-semibold text-xs md:text-sm tracking-wide transition-colors duration-500 [&_p]:m-0 ${dark ? 'border-white/15 text-white' : 'border-[#1A1A1A]/20 text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(word)} />
+              <span key={i} className={`whitespace-nowrap px-3 sm:px-4 md:px-6 py-2 md:py-2.5 rounded-full border font-semibold text-[11px] sm:text-xs md:text-sm tracking-wide transition-colors duration-500 [&_p]:m-0 ${dark ? 'border-white/15 text-white' : 'border-[#1A1A1A]/20 text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(word)} />
             ))}
             <span className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#C5FF00] flex items-center justify-center shrink-0">
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-[#1A1A1A]" />
             </span>
             {pills[pills.length - 1] && (
-              <span className={`px-4 md:px-6 py-2 md:py-2.5 rounded-full border font-semibold text-xs md:text-sm tracking-wide transition-colors duration-500 [&_p]:m-0 ${dark ? 'border-white/15 text-white' : 'border-[#1A1A1A]/20 text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(pills[pills.length - 1])} />
+              <span className={`whitespace-nowrap px-3 sm:px-4 md:px-6 py-2 md:py-2.5 rounded-full border font-semibold text-[11px] sm:text-xs md:text-sm tracking-wide transition-colors duration-500 [&_p]:m-0 ${dark ? 'border-white/15 text-white' : 'border-[#1A1A1A]/20 text-[#1A1A1A]'}`} dangerouslySetInnerHTML={renderHTML(pills[pills.length - 1])} />
             )}
           </div>
         </FadeUp>
